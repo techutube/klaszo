@@ -14,3 +14,6 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
   jwt.secret: mynameisshubhamsinghandiaambuildinganewprojectforeducationcenter
+razorpay:
+  key-id: YOUR_RAZORPAY_KEY_ID
+  key-secret: YOUR_RAZORPAY_KEY_SECRET
