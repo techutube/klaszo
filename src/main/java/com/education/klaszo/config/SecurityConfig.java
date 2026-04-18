@@ -28,6 +28,8 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/courses/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/subjects/**").permitAll()
+                        // Admin endpoints
+                        .requestMatchers("/api/admin/**").hasAnyRole("ADMIN", "OWNER")
                         // Everything else requires a valid JWT
                         .anyRequest().authenticated()
                 )

@@ -94,6 +94,13 @@
 			<scope>runtime</scope>
 		</dependency>
 
+		<!-- AWS SDK for S3 (Cloudflare R2 compatible) -->
+		<dependency>
+			<groupId>software.amazon.awssdk</groupId>
+			<artifactId>s3</artifactId>
+			<version>2.20.100</version>
+		</dependency>
+
 	</dependencies>
 
 	<build>

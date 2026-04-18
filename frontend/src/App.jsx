@@ -4,6 +4,7 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Checkout from './pages/Checkout';
+import AdminUpload from './pages/AdminUpload';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/checkout/:subjectId" element={<Checkout />} />
+              <Route path="/admin/upload" element={<AdminUpload />} />
             </Routes>
           </main>
         </div>

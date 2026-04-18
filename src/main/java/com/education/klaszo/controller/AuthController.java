@@ -25,6 +25,7 @@ public class AuthController {
             User newUser = new User();
             newUser.setEmail("demo@klaszo.com");
             newUser.setName("Demo Student");
+            newUser.setRole("ADMIN");
             newUser.setFirebaseUid("demo-uid-" + System.currentTimeMillis());
             return userRepository.save(newUser);
         });

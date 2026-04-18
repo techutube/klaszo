@@ -24,6 +24,9 @@ public class CourseService {
     private final ContentItemRepository contentItemRepository;
     private final EnrollmentRepository enrollmentRepository;
 
+    @org.springframework.beans.factory.annotation.Value("${cloudflare.r2.public-url}")
+    private String publicUrl;
+
     // All courses — public, no login needed
     public List<CourseDTO> getAllCourses() {
         return courseRepository.findAllByOrderByTitleAsc()
@@ -75,12 +78,10 @@ public class CourseService {
     }
 
     private String buildStreamUrl(ContentItem item) {
-        // For now returns a placeholder — you'll replace this
-        // with real Cloudflare signed URLs in a later step
-        if ("VIDEO".equals(item.getContentType())) {
-            return "https://customer-xxxx.cloudflarestream.com/" + item.getStorageKey() + "/manifest/video.m3u8";
-        } else {
-            return "/api/content/pdf/" + item.getId();
+        String baseUrl = publicUrl;
+        if (!baseUrl.endsWith("/")) {
+            baseUrl += "/";
         }
+        return baseUrl + item.getStorageKey();
     }
 }

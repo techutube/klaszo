@@ -1,6 +1,6 @@
 import { useContext } from 'react';
 import { Link } from 'react-router-dom';
-import { BookOpen, User, LogOut } from 'lucide-react';
+import { BookOpen, User, LogOut, LayoutDashboard } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import './Navbar.css';
 
@@ -21,6 +21,11 @@ const Navbar = () => {
               <span className="user-greeting">
                 <User size={18} /> Hi, {user.name}
               </span>
+              {(user.role === 'ADMIN' || user.role === 'OWNER') && (
+                <Link to="/admin/upload" className="btn-secondary nav-admin-btn">
+                  <LayoutDashboard size={18} /> Admin Panel
+                </Link>
+              )}
               <button onClick={logout} className="btn-icon">
                 <LogOut size={18} />
               </button>

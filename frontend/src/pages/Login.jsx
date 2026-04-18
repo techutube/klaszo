@@ -16,9 +16,9 @@ const Login = () => {
       setError('');
       
       const response = await axios.post('http://localhost:8080/api/auth/demo-login');
-      const { token } = response.data;
+      const { token, user } = response.data;
       
-      login(token);
+      login(token, user);
       navigate('/');
     } catch (err) {
       console.error(err);

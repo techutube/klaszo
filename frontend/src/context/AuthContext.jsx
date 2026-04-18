@@ -3,22 +3,25 @@ import { createContext, useState, useEffect } from 'react';
 export const AuthContext = createContext(null);
 
 export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem('user')));
   const [token, setToken] = useState(localStorage.getItem('token'));
 
   useEffect(() => {
     if (token) {
       localStorage.setItem('token', token);
-      // In a real app, you would decode the JWT or fetch user details here
-      setUser({ email: 'student@klaszo.com', name: 'Student' });
     } else {
       localStorage.removeItem('token');
+      localStorage.removeItem('user');
       setUser(null);
     }
   }, [token]);
 
-  const login = (newToken) => {
+  const login = (newToken, userData) => {
     setToken(newToken);
+    if (userData) {
+      setUser(userData);
+      localStorage.setItem('user', JSON.stringify(userData));
+    }
   };
 
   const logout = () => {
