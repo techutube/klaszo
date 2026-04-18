@@ -6,12 +6,11 @@ import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
-@Data
-@AllArgsConstructor
-@NoArgsConstructor
-public class CourseDTO {
+@Data @AllArgsConstructor @NoArgsConstructor
+public class SubjectDTO {
     private UUID id;
     private String title;
     private String description;
-    private String thumbnailUrl;
+    private int pricePaise;
+    private boolean enrolled;   // true if the logged-in user has paid
 }

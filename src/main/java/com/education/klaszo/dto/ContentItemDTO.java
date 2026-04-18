@@ -7,10 +7,12 @@ import lombok.NoArgsConstructor;
 import java.util.UUID;
 
 @Data @AllArgsConstructor @NoArgsConstructor
-public class SubjectDTO {
+public class ContentItemDTO {
     private UUID id;
     private String title;
-    private String description;
-    private int pricePaise;
-    private boolean enrolled;   // true if the logged-in user has paid
+    private String contentType;  // "VIDEO" or "PDF"
+    private boolean isFree;
+    private Integer durationSeconds;
+    private String streamUrl;    // only populated if user is enrolled OR item is free
+    // storageKey is NEVER sent to frontend
 }
