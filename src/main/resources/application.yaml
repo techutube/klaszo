@@ -19,13 +19,20 @@ spring:
       max-file-size: 500MB
       max-request-size: 500MB
 razorpay:
-  key-id: YOUR_RAZORPAY_KEY_ID
-  key-secret: YOUR_RAZORPAY_KEY_SECRET
+  key-id: ${RAZORPAY_KEY_ID}
+  key-secret: ${RAZORPAY_KEY_SECRET}
 
 cloudflare:
   r2:
-    account-id: YOUR_ACCOUNT_ID
-    access-key: YOUR_ACCESS_KEY
-    secret-key: YOUR_SECRET_KEY
-    bucket-name: YOUR_BUCKET_NAME
+    account-id: ${CLOUDFLARE_ACCOUNT_ID}
+    access-key: ${CLOUDFLARE_ACCESS_KEY}
+    secret-key: ${CLOUDFLARE_SECRET_KEY}
+    bucket-name: ${CLOUDFLARE_BUCKET_NAME}
     public-url: https://your-public-url.com
+    
+firebase:
+  project-id: ${FIREBASE_PROJECT_ID}
+  client-email: ${FIREBASE_CLIENT_EMAIL}
+  private-key: ${FIREBASE_PRIVATE_KEY}
+  private-key-id: ${FIREBASE_PRIVATE_KEY_ID}
+  client-id: ${FIREBASE_CLIENT_ID}
