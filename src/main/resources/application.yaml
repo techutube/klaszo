@@ -2,7 +2,8 @@ spring:
   application:
     name: klaszo
   datasource:
-    url: jdbc:postgresql://aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true
+    url: jdbc:postgresql://aws-1-ap-northeast-1.pooler.supabase.com:6543/postgres?pgbouncer=true&prepareThreshold=0
+
     username: postgres.whhuilavydzaibdzuler
     password: Supabase@123
     driver-class-name: org.postgresql.Driver
@@ -28,7 +29,7 @@ cloudflare:
     access-key: ${CLOUDFLARE_ACCESS_KEY}
     secret-key: ${CLOUDFLARE_SECRET_KEY}
     bucket-name: ${CLOUDFLARE_BUCKET_NAME}
-    public-url: https://your-public-url.com
+    public-url: ${CLOUDFLARE_PUBLIC_URL}
     
 firebase:
   project-id: ${FIREBASE_PROJECT_ID}

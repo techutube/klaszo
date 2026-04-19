@@ -21,7 +21,7 @@ const Login = () => {
       const idToken = await result.user.getIdToken();
       
       // Send the Firebase ID token to our backend
-      const response = await axios.post('http://localhost:8080/api/auth/google', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/google`, {
         idToken: idToken
       });
       

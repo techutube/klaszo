@@ -16,7 +16,7 @@ const SubjectContent = () => {
     const fetchContent = async () => {
       try {
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await axios.get(`http://localhost:8080/api/subjects/${subjectId}/content`, config);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/subjects/${subjectId}/content`, config);
         setContent(response.data);
       } catch (error) {
         console.error("Error fetching content", error);

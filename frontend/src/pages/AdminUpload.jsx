@@ -24,7 +24,7 @@ const AdminUpload = () => {
 
   useEffect(() => {
     // Fetch courses for the dropdown
-    axios.get('http://localhost:8080/api/courses')
+    axios.get(`${import.meta.env.VITE_API_URL}/api/courses`)
       .then(res => setCourses(res.data))
       .catch(err => console.error("Failed to fetch courses", err));
   }, []);
@@ -36,7 +36,7 @@ const AdminUpload = () => {
     if (courseId) {
       // Fetch subjects for the selected course
       // Assuming you have an endpoint for this, or just filter all subjects
-      axios.get(`http://localhost:8080/api/courses/${courseId}/subjects`)
+      axios.get(`${import.meta.env.VITE_API_URL}/api/courses/${courseId}/subjects`)
         .then(res => setSubjects(res.data))
         .catch(err => console.error("Failed to fetch subjects", err));
     } else {
@@ -67,7 +67,7 @@ const AdminUpload = () => {
       setLoading(true);
       setMessage({ type: '', text: '' });
       
-      await axios.post('http://localhost:8080/api/admin/content/upload', data, {
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/content/upload`, data, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'multipart/form-data'

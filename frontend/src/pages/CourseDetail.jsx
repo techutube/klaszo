@@ -15,7 +15,7 @@ const CourseDetail = () => {
     const fetchSubjects = async () => {
       try {
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await axios.get(`http://localhost:8080/api/courses/${courseId}/subjects`, config);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/courses/${courseId}/subjects`, config);
         setSubjects(response.data);
       } catch (error) {
         console.error("Error fetching subjects", error);
