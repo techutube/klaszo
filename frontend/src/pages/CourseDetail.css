@@ -1,0 +1,108 @@
+.course-detail-page {
+  padding: 3rem 0;
+}
+
+.detail-header {
+  margin-bottom: 3rem;
+  text-align: center;
+}
+
+.detail-title {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.detail-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.subjects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 2rem;
+}
+
+.subject-card {
+  display: flex;
+  gap: 1.5rem;
+  padding: 2rem;
+  transition: transform 0.3s ease;
+}
+
+.subject-card:hover {
+  transform: translateY(-5px);
+}
+
+.subject-icon-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 64px;
+  background: var(--primary-gradient);
+  border-radius: 16px;
+  color: white;
+  flex-shrink: 0;
+}
+
+.subject-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.subject-title {
+  font-size: 1.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.subject-desc {
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  margin-bottom: 1.5rem;
+  line-height: 1.5;
+}
+
+.subject-actions {
+  margin-top: auto;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.view-btn {
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+}
+
+.enroll-btn-text {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--primary-color);
+  font-size: 0.85rem;
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.enroll-btn-text:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+  .subject-card {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .subject-icon-wrapper {
+    margin: 0 auto;
+  }
+  
+  .subject-actions {
+    justify-content: center;
+  }
+}

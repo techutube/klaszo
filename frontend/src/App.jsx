@@ -4,7 +4,10 @@ import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
 import Checkout from './pages/Checkout';
+import CourseDetail from './pages/CourseDetail';
 import AdminUpload from './pages/AdminUpload';
+import SubjectContent from './pages/SubjectContent';
+import AdminRoute from './components/AdminRoute';
 
 function App() {
   return (
@@ -16,8 +19,16 @@ function App() {
             <Routes>
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/course/:courseId" element={<CourseDetail />} />
               <Route path="/checkout/:subjectId" element={<Checkout />} />
-              <Route path="/admin/upload" element={<AdminUpload />} />
+              <Route path="/subject/:subjectId" element={<SubjectContent />} />
+
+              <Route path="/admin/upload" element={
+
+                <AdminRoute>
+                  <AdminUpload />
+                </AdminRoute>
+              } />
             </Routes>
           </main>
         </div>
@@ -25,5 +36,6 @@ function App() {
     </AuthProvider>
   );
 }
+
 
 export default App;

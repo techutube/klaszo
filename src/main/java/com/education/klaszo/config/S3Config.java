@@ -24,13 +24,15 @@ public class S3Config {
 
     @Bean
     public S3Client s3Client() {
-        String endpoint = String.format("https://%s.r2.cloudflarestorage.com", accountId);
+        String cleanAccountId = accountId.trim();
+        String endpoint = String.format("https://%s.r2.cloudflarestorage.com", cleanAccountId);
         
         return S3Client.builder()
                 .endpointOverride(URI.create(endpoint))
                 .credentialsProvider(StaticCredentialsProvider.create(
-                        AwsBasicCredentials.create(accessKey, secretKey)))
-                .region(Region.US_EAST_1) // R2 doesn't use regions but the SDK requires one
+                        AwsBasicCredentials.create(accessKey.trim(), secretKey.trim())))
+                .region(Region.US_EAST_1)
                 .build();
     }
+
 }

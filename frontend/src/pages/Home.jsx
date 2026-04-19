@@ -57,9 +57,10 @@ const Home = () => {
                       Wait! The API returns courses. The checkout requires subjectId.
                       We should probably fetch subjects for a course, but let's just pretend course.id is what we need to buy for now,
                       or let's just put a "View details" button. Let's just go to checkout with course id. */}
-                  <Link to={`/checkout/${course.id}`} className="btn-primary course-btn">
-                    Enroll Now <ChevronRight size={18} />
+                  <Link to={`/course/${course.id}`} className="btn-primary course-btn">
+                    View Subjects <ChevronRight size={18} />
                   </Link>
+
                 </div>
               </div>
             ))}

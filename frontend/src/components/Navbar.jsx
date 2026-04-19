@@ -1,11 +1,13 @@
 import { useContext } from 'react';
-import { Link } from 'react-router-dom';
-import { BookOpen, User, LogOut, LayoutDashboard } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
+import { BookOpen, User, LogOut, LayoutDashboard, GraduationCap } from 'lucide-react';
 import { AuthContext } from '../context/AuthContext';
 import './Navbar.css';
 
 const Navbar = () => {
   const { user, logout } = useContext(AuthContext);
+  const location = useLocation();
+  const isAdminPath = location.pathname.startsWith('/admin');
 
   return (
     <header className="navbar glass-panel">
@@ -19,14 +21,22 @@ const Navbar = () => {
           {user ? (
             <div className="user-menu">
               <span className="user-greeting">
-                <User size={18} /> Hi, {user.name}
+                <User size={18} /> {user.name}
               </span>
+              
               {(user.role === 'ADMIN' || user.role === 'OWNER') && (
-                <Link to="/admin/upload" className="btn-secondary nav-admin-btn">
-                  <LayoutDashboard size={18} /> Admin Panel
-                </Link>
+                isAdminPath ? (
+                  <Link to="/" className="btn-secondary nav-admin-btn">
+                    <GraduationCap size={18} /> Student View
+                  </Link>
+                ) : (
+                  <Link to="/admin/upload" className="btn-secondary nav-admin-btn">
+                    <LayoutDashboard size={18} /> Admin Panel
+                  </Link>
+                )
               )}
-              <button onClick={logout} className="btn-icon">
+              
+              <button onClick={logout} className="btn-icon logout-btn" title="Logout">
                 <LogOut size={18} />
               </button>
             </div>
@@ -40,3 +50,4 @@ const Navbar = () => {
 };
 
 export default Navbar;
+
