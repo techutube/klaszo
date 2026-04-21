@@ -11,10 +11,16 @@ const Home = () => {
   useEffect(() => {
     const fetchCourses = async () => {
       try {
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/courses`);
-        setCourses(response.data);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/courses`);
+        if (Array.isArray(response.data)) {
+          setCourses(response.data);
+        } else {
+          console.error("API response is not an array:", response.data);
+          setCourses([]);
+        }
       } catch (error) {
         console.error("Error fetching courses", error);
+        setCourses([]);
       } finally {
         setLoading(false);
       }

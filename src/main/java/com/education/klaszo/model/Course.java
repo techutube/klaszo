@@ -24,8 +24,17 @@ public class Course {
     private UUID id;
     private String title;
     private String description;
+
     @Column(name = "thumbnail_url")
     private String thumbnailUrl;
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @Column(name = "created_at", nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

@@ -2,8 +2,10 @@ package com.education.klaszo.controller;
 
 import com.education.klaszo.model.ContentItem;
 import com.education.klaszo.model.Subject;
+import com.education.klaszo.model.Course;
 import com.education.klaszo.repository.ContentItemRepository;
 import com.education.klaszo.repository.SubjectRepository;
+import com.education.klaszo.repository.CourseRepository;
 import com.education.klaszo.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -11,17 +13,49 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/admin/content")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class AdminContentController {
 
     private final ContentItemRepository contentItemRepository;
     private final SubjectRepository subjectRepository;
+    private final CourseRepository courseRepository;
     private final FileStorageService fileStorageService;
+
+    @PostMapping("/courses")
+    public ResponseEntity<?> createCourse(@RequestBody Course course) {
+        return ResponseEntity.ok(courseRepository.save(course));
+    }
+
+    @PutMapping("/courses/{id}")
+    public ResponseEntity<?> updateCourse(@PathVariable UUID id, @RequestBody Course courseDetails) {
+        Course course = courseRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Course not found"));
+        course.setTitle(courseDetails.getTitle());
+        course.setDescription(courseDetails.getDescription());
+        if (courseDetails.getThumbnailUrl() != null) {
+            course.setThumbnailUrl(courseDetails.getThumbnailUrl());
+        }
+        return ResponseEntity.ok(courseRepository.save(course));
+    }
+
+    @PostMapping("/subjects")
+    public ResponseEntity<?> createSubject(@RequestBody Subject subject) {
+        return ResponseEntity.ok(subjectRepository.save(subject));
+    }
+
+    @PutMapping("/subjects/{id}")
+    public ResponseEntity<?> updateSubject(@PathVariable UUID id, @RequestBody Subject subjectDetails) {
+        Subject subject = subjectRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Subject not found"));
+        subject.setTitle(subjectDetails.getTitle());
+        subject.setDescription(subjectDetails.getDescription());
+        return ResponseEntity.ok(subjectRepository.save(subject));
+    }
 
     @PostMapping("/upload")
     public ResponseEntity<?> uploadContent(
@@ -29,7 +63,7 @@ public class AdminContentController {
             @RequestParam("subjectId") UUID subjectId,
             @RequestParam("title") String title,
             @RequestParam("contentType") String contentType,
-            @RequestParam(value = "isFree", defaultValue = "false") boolean isFree,
+            @RequestParam(value = "pricePaise", defaultValue = "0") Integer pricePaise,
             @RequestParam(value = "displayOrder", defaultValue = "0") int displayOrder
     ) {
         try {
@@ -43,11 +77,22 @@ public class AdminContentController {
             contentItem.setTitle(title);
             contentItem.setContentType(contentType);
             contentItem.setStorageKey(fileName);
-            contentItem.setFree(isFree);
+            contentItem.setPricePaise(pricePaise);
             contentItem.setDisplayOrder(displayOrder);
+            contentItem.setFree(pricePaise == 0);
 
-            ContentItem savedItem = contentItemRepository.save(contentItem);
-            return ResponseEntity.ok(savedItem);
+            contentItemRepository.save(contentItem);
+
+            // Recalculate Subject Total Price
+            List<ContentItem> items = contentItemRepository.findBySubjectIdOrderByDisplayOrderAsc(subjectId);
+            int totalSubjectPrice = items.stream()
+                    .mapToInt(item -> item.getPricePaise() != null ? item.getPricePaise() : 0)
+                    .sum();
+            
+            subject.setPricePaise(totalSubjectPrice);
+            subjectRepository.save(subject);
+
+            return ResponseEntity.ok(contentItem);
         } catch (IOException e) {
             return ResponseEntity.internalServerError().body("Failed to store file: " + e.getMessage());
         } catch (IllegalArgumentException e) {

@@ -1,13 +1,19 @@
 .navbar {
   position: sticky;
   top: 0;
-  z-index: 50;
-  border-bottom: 1px solid var(--glass-border);
+  z-index: 1000;
+  margin-bottom: 2rem;
+  border-bottom: 3px solid var(--nav-accent, transparent);
+  border-top: none;
+  border-left: none;
+  border-right: none;
   border-radius: 0;
-  padding: 1rem 0;
+  background: var(--nav-bg);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
 .nav-container {
+  height: 100px; /* Balanced height */
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -16,49 +22,159 @@
 .brand {
   display: flex;
   align-items: center;
-  gap: 0.5rem;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.brand-logo {
+  height: 75px; /* Slightly smaller but still clear */
+  width: auto;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+  filter: var(--logo-filter);
+}
+
+.brand:hover .brand-logo {
+  transform: scale(1.05);
+}
+
+.brand-text {
   font-size: 1.5rem;
   font-weight: 800;
   color: var(--text-main);
-  font-family: 'Outfit', sans-serif;
+  font-family: 'Ethnocentric', sans-serif;
+  letter-spacing: -0.025em;
 }
 
-.brand-icon {
-  color: var(--primary);
-}
-
-.user-menu {
+.nav-actions {
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 }
 
-.user-greeting {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--text-muted);
-  font-weight: 500;
-}
-
-.btn-icon {
+.theme-toggle {
   background: transparent;
   border: 1px solid var(--glass-border);
-  color: var(--text-muted);
-  width: 36px;
-  height: 36px;
+  color: var(--text-main);
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.theme-toggle:hover {
+  background: var(--surface-hover);
+  transform: rotate(15deg);
+}
+
+.user-profile-wrapper {
+  position: relative;
+}
+
+.user-profile-trigger {
+  background: transparent;
+  border: 1px solid var(--glass-border);
+  color: var(--text-main);
+  padding: 0.4rem 0.8rem;
+  border-radius: 50px;
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
   transition: all 0.2s ease;
 }
 
-.btn-icon:hover {
-  background: rgba(239, 68, 68, 0.1);
-  color: #ef4444;
-  border-color: #ef4444;
+.user-profile-trigger:hover {
+  background: var(--surface-hover);
 }
+
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
+.user-name {
+  font-weight: 500;
+  font-size: 0.95rem;
+}
+
+.rotate {
+  transform: rotate(180deg);
+}
+
+.user-dropdown {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 220px;
+  padding: 0.75rem;
+  box-shadow: var(--shadow-lg);
+  animation: slideIn 0.2s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.dropdown-header {
+  padding: 0.5rem 0.75rem 0.75rem;
+}
+
+.dropdown-user-name {
+  font-weight: 600;
+  font-size: 1rem;
+  margin-bottom: 0.1rem;
+}
+
+.dropdown-user-role {
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.dropdown-divider {
+  height: 1px;
+  background: var(--glass-border);
+  margin: 0.5rem 0;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.6rem 0.75rem;
+  border-radius: var(--radius-md);
+  color: var(--text-main);
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  width: 100%;
+  text-align: left;
+  border: none;
+  background: transparent;
+}
+
+.dropdown-item:hover {
+  background: var(--surface-hover);
+}
+
+.dropdown-item.logout {
+  color: #EF4444;
+}
+
+.dropdown-item.logout:hover {
+  background: rgba(239, 68, 68, 0.1);
 
 .nav-admin-btn {
   display: flex;

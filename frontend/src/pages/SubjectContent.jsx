@@ -16,10 +16,16 @@ const SubjectContent = () => {
     const fetchContent = async () => {
       try {
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/subjects/${subjectId}/content`, config);
-        setContent(response.data);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/subjects/${subjectId}/content`, config);
+        if (Array.isArray(response.data)) {
+          setContent(response.data);
+        } else {
+          console.error("API response for content is not an array:", response.data);
+          setContent([]);
+        }
       } catch (error) {
         console.error("Error fetching content", error);
+        setContent([]);
       } finally {
         setLoading(false);
       }

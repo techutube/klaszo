@@ -27,9 +27,19 @@ public class Subject {
     private String title;
     private String description;
 
-    @Column(name = "price_paise")
-    private int pricePaise = 49900;
+    @Column(name = "price_paise", nullable = false)
+    private Integer pricePaise;
 
-    @Column(name = "display_order")
-    private int displayOrder;
+    @Column(name = "display_order", nullable = false)
+    private Integer displayOrder;
+
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        if (pricePaise == null) {
+            pricePaise = 0;
+        }
+        if (displayOrder == null) {
+            displayOrder = 0;
+        }
+    }
 }

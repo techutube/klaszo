@@ -1,4 +1,5 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
@@ -8,32 +9,53 @@ import CourseDetail from './pages/CourseDetail';
 import AdminUpload from './pages/AdminUpload';
 import SubjectContent from './pages/SubjectContent';
 import AdminRoute from './components/AdminRoute';
+import { analytics, logEvent } from './firebase';
+import { Analytics } from '@vercel/analytics/react';
+
+import { ThemeProvider } from './context/ThemeContext';
+
+// Component to track page views
+const PageViewTracker = () => {
+  const location = useLocation();
+
+  useEffect(() => {
+    logEvent(analytics, 'page_view', {
+      page_path: location.pathname,
+    });
+  }, [location]);
+
+  return null;
+};
 
 function App() {
   return (
-    <AuthProvider>
-      <Router>
-        <div className="app-wrapper">
-          <Navbar />
-          <main className="main-content container">
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/course/:courseId" element={<CourseDetail />} />
-              <Route path="/checkout/:subjectId" element={<Checkout />} />
-              <Route path="/subject/:subjectId" element={<SubjectContent />} />
+    <ThemeProvider>
+      <AuthProvider>
+        <Router>
+          <PageViewTracker />
+          <Analytics />
+          <div className="app-wrapper">
+            <Navbar />
+            <main className="main-content container">
+              <Routes>
+                <Route path="/" element={<Home />} />
+                <Route path="/login" element={<Login />} />
+                <Route path="/course/:courseId" element={<CourseDetail />} />
+                <Route path="/checkout/:subjectId" element={<Checkout />} />
+                <Route path="/subject/:subjectId" element={<SubjectContent />} />
 
-              <Route path="/admin/upload" element={
+                <Route path="/admin/upload" element={
 
-                <AdminRoute>
-                  <AdminUpload />
-                </AdminRoute>
-              } />
-            </Routes>
-          </main>
-        </div>
-      </Router>
-    </AuthProvider>
+                  <AdminRoute>
+                    <AdminUpload />
+                  </AdminRoute>
+                } />
+              </Routes>
+            </main>
+          </div>
+        </Router>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
 

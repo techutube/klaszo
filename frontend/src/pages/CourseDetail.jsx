@@ -15,10 +15,16 @@ const CourseDetail = () => {
     const fetchSubjects = async () => {
       try {
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await axios.get(`${import.meta.env.VITE_API_URL}/api/courses/${courseId}/subjects`, config);
-        setSubjects(response.data);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/courses/${courseId}/subjects`, config);
+        if (Array.isArray(response.data)) {
+          setSubjects(response.data);
+        } else {
+          console.error("API response for subjects is not an array:", response.data);
+          setSubjects([]);
+        }
       } catch (error) {
         console.error("Error fetching subjects", error);
+        setSubjects([]);
       } finally {
         setLoading(false);
       }

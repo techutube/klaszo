@@ -39,6 +39,22 @@ public class ContentItem {
     @Column(name = "is_free")
     private boolean isFree = false;
 
+    @Column(name = "price_paise")
+    private Integer pricePaise = 0;
+
     @Column(name = "display_order")
     private int displayOrder;
+
+    @jakarta.persistence.PrePersist
+    protected void onCreate() {
+        if (pricePaise == null) {
+            pricePaise = 0;
+        }
+        // If price is 0, mark as free automatically
+        if (pricePaise == 0) {
+            isFree = true;
+        } else {
+            isFree = false;
+        }
+    }
 }
