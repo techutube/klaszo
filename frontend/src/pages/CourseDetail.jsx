@@ -1,13 +1,14 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { Book, ChevronRight, Lock, PlayCircle, FileText } from 'lucide-react';
+import { Book, ChevronRight, ChevronLeft, Lock, PlayCircle, FileText } from 'lucide-react';
 import './CourseDetail.css';
 
 const CourseDetail = () => {
   const { courseId } = useParams();
   const { user, token } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [subjects, setSubjects] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -35,6 +36,9 @@ const CourseDetail = () => {
 
   return (
     <div className="course-detail-page">
+      <button onClick={() => navigate(-1)} className="back-link">
+        <ChevronLeft size={20} /> Back to Courses
+      </button>
       <div className="detail-header">
         <h1 className="detail-title">Choose your <span className="gradient-text">Subject</span></h1>
         <p className="detail-subtitle">Select a subject to access study materials, notes, and video lectures.</p>
