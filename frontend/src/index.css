@@ -173,4 +173,57 @@ button {
 .main-content {
   flex: 1;
   padding: 2rem 0;
+}.courses-grid {
+  display: grid !important;
+  grid-template-columns: repeat(2, 1fr) !important;
+  gap: 2rem !important;
+  margin: 3rem 0 !important;
+  width: 100% !important;
 }
+
+.course-card {
+  background: var(--surface-color) !important;
+  border-radius: var(--radius-xl) !important;
+  border: 1px solid var(--glass-border) !important;
+  overflow: hidden !important;
+  display: flex !important;
+  flex-direction: column !important;
+  transition: all 0.3s ease !important;
+  min-height: 420px !important;
+}
+
+.course-content {
+  padding: 2.5rem !important;
+  flex-grow: 1 !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+.course-image-placeholder {
+  height: 160px !important;
+  background: rgba(0,0,0,0.05) !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+.course-placeholder-icon {
+  width: 32px !important;
+  height: 32px !important;
+  opacity: 0.8 !important;
+}
+
+.course-btn {
+  width: 100% !important;
+  justify-content: center !important;
+  padding: 1rem !important;
+  margin-top: auto !important;
+}
+
+@media (max-width: 992px) {
+  .courses-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+

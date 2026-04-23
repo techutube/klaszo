@@ -52,7 +52,7 @@ const Home = () => {
             {courses.map((course) => (
               <div key={course.id} className="course-card glass-panel">
                 <div className="course-image-placeholder">
-                  <BookOpen size={48} className="course-placeholder-icon" />
+                  <BookOpen size={24} className="course-placeholder-icon" />
                 </div>
                 <div className="course-content">
                   <h3 className="course-title">{course.title}</h3>
