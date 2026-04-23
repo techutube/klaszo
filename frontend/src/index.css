@@ -23,10 +23,10 @@
   --glass-bg: rgba(30, 41, 59, 0.7);
   --glass-border: rgba(255, 255, 255, 0.1);
   --shadow-glow: 0 0 25px rgba(79, 70, 229, 0.2);
-  --nav-bg: rgba(60, 75, 100, 0.98); /* Significantly lighter for clear distinction */
-  --nav-border: rgba(255, 255, 255, 0.2);
-  --nav-accent: #6366F1; /* Vibrant indigo accent line */
-  --logo-filter: drop-shadow(0 0 10px rgba(255,255,255,0.25));
+  --nav-bg: rgba(13, 17, 28, 0.95); /* Deep midnight blue, much closer to background */
+  --nav-border: rgba(255, 255, 255, 0.08);
+  --nav-accent: rgba(79, 70, 229, 0.6); /* Subtle indigo glow at the bottom */
+  --logo-filter: drop-shadow(0 0 12px rgba(79, 70, 229, 0.15));
 }
 
 .light-theme {
