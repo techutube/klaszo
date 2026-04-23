@@ -97,7 +97,9 @@ const Login = () => {
       
       const { token, user } = response.data;
       
-      if (!user.name || !user.email) {
+      // Only ask for profile if user has never set their name (first-time signup)
+      // Email is optional, so don't re-prompt just because it's missing
+      if (!user.name) {
         setStep(3);
         localStorage.setItem('temp_token', token);
         localStorage.setItem('temp_uid', user.firebaseUid);
