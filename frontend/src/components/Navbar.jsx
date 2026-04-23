@@ -4,7 +4,7 @@ import { User, LogOut, LayoutDashboard, GraduationCap, Sun, Moon, ChevronDown, S
 import { AuthContext } from '../context/AuthContext';
 import { ThemeContext } from '../context/ThemeContext';
 import { auth } from '../firebase';
-import { sendEmailVerification, verifyBeforeUpdateEmail } from 'firebase/auth';
+import { verifyBeforeUpdateEmail } from 'firebase/auth';
 import './Navbar.css';
 
 const Navbar = () => {
