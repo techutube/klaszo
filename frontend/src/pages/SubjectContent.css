@@ -3,19 +3,24 @@
 }
 
 .back-link {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 0.5rem;
-  color: var(--text-secondary);
-  text-decoration: none;
-  margin-bottom: 1.5rem;
+  gap: 0.4rem;
+  color: var(--text-muted);
+  font-size: 0.9rem;
   font-weight: 500;
-  transition: color 0.3s ease;
+  margin-bottom: 1.5rem;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  transition: color 0.2s ease;
 }
 
 .back-link:hover {
-  color: var(--primary-color);
+  color: var(--primary);
 }
+
 
 .content-layout {
   display: grid;

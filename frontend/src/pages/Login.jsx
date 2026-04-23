@@ -292,6 +292,17 @@ const Login = () => {
               <button type="submit" className="btn-primary auth-btn" disabled={loading}>
                 {loading ? 'Finalizing...' : 'Complete Profile'} <ChevronRight size={18} />
               </button>
+              <button
+                type="button"
+                className="btn-link"
+                disabled={loading}
+                onClick={() => {
+                  setProfileData(prev => ({ ...prev, email: '' }));
+                  handleProfileSubmit({ preventDefault: () => {} });
+                }}
+              >
+                Skip for now — add email later
+              </button>
             </form>
           )}
         </div>

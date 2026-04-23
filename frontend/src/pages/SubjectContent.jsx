@@ -1,5 +1,5 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
 import { FileText, Video, Lock, ExternalLink, ChevronLeft } from 'lucide-react';
@@ -8,6 +8,7 @@ import './SubjectContent.css';
 const SubjectContent = () => {
   const { subjectId } = useParams();
   const { token } = useContext(AuthContext);
+  const navigate = useNavigate();
   const [content, setContent] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeItem, setActiveItem] = useState(null);
@@ -72,9 +73,9 @@ const SubjectContent = () => {
 
   return (
     <div className="subject-content-page">
-      <Link to="/" className="back-link">
-        <ChevronLeft size={20} /> Back to Courses
-      </Link>
+      <button onClick={() => navigate(-1)} className="back-link">
+        <ChevronLeft size={20} /> Back
+      </button>
       
       <div className="content-layout">
         <div className="content-sidebar glass-panel">
