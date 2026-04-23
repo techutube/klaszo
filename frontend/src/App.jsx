@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { AuthProvider } from './context/AuthContext';
 import Navbar from './components/Navbar';
@@ -45,11 +45,13 @@ function App() {
                 <Route path="/subject/:subjectId" element={<SubjectContent />} />
 
                 <Route path="/admin/upload" element={
-
                   <AdminRoute>
                     <AdminUpload />
                   </AdminRoute>
                 } />
+
+                {/* Catch-all route redirects to home */}
+                <Route path="*" element={<Navigate to="/" replace />} />
               </Routes>
             </main>
           </div>
@@ -58,6 +60,5 @@ function App() {
     </ThemeProvider>
   );
 }
-
 
 export default App;

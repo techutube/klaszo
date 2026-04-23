@@ -26,13 +26,19 @@ public class User {
     @Column(name = "firebase_uid", nullable = false, unique = true)
     private String firebaseUid;
 
-    @Column(nullable = false, unique = true)
+    @Column(unique = true, nullable = true)
     private String email;
+
+    @Column(name = "phone_number", unique = true)
+    private String phoneNumber;
 
     private String name;
 
     @Column(nullable = false)
     private String role = "STUDENT";
+
+    @Column(name = "is_email_verified")
+    private boolean isEmailVerified = false;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();

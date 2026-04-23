@@ -1,16 +1,160 @@
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { auth, googleProvider } from '../firebase';
-import { signInWithPopup } from 'firebase/auth';
+import { signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, updateEmail } from 'firebase/auth';
 import { AuthContext } from '../context/AuthContext';
+import { Phone, MessageSquare, User, Mail, ChevronRight, AlertCircle } from 'lucide-react';
 import './Login.css';
 
 const Login = () => {
+  const [step, setStep] = useState(1); // 1: Phone, 2: OTP, 3: Profile
+  const [phoneNumber, setPhoneNumber] = useState('+91 ');
+  const [otp, setOtp] = useState('');
+  const [verificationId, setVerificationId] = useState(null);
+  
+  const [profileData, setProfileData] = useState({
+    name: '',
+    email: ''
+  });
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+
+  useEffect(() => {
+    return () => {
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+      }
+    };
+  }, []);
+
+  const setupRecaptcha = () => {
+    if (!window.recaptchaVerifier) {
+      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+        'size': 'invisible',
+        'callback': (response) => {}
+      });
+    }
+  };
+
+  const handlePhoneChange = (e) => {
+    let val = e.target.value;
+    if (!val.startsWith('+91 ')) {
+      val = '+91 ' + val.replace(/^\+?9?1?\s?/, '');
+    }
+    setPhoneNumber(val);
+  };
+
+  const handleSendOtp = async (e) => {
+    e.preventDefault();
+    if (!phoneNumber || phoneNumber.length < 13) {
+      setError('Please enter a valid phone number (e.g. +91 9876543210)');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      setupRecaptcha();
+      
+      const appVerifier = window.recaptchaVerifier;
+      const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+      
+      setVerificationId(confirmationResult);
+      setStep(2);
+    } catch (err) {
+      console.error(err);
+      setError('Failed to send OTP. Please check the number.');
+      if (window.recaptchaVerifier) {
+        window.recaptchaVerifier.clear();
+        window.recaptchaVerifier = null;
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if (!otp || otp.length !== 6) {
+      setError('Please enter a valid 6-digit OTP.');
+      return;
+    }
+
+    try {
+      setLoading(true);
+      setError('');
+      
+      const result = await verificationId.confirm(otp);
+      const idToken = await result.user.getIdToken();
+      
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/firebase-login`, {
+        idToken: idToken
+      });
+      
+      const { token, user } = response.data;
+      
+      if (!user.name || !user.email) {
+        setStep(3);
+        localStorage.setItem('temp_token', token);
+        localStorage.setItem('temp_uid', user.firebaseUid);
+      } else {
+        login(token, user);
+        navigate('/');
+      }
+    } catch (err) {
+      console.error(err);
+      setError('Invalid OTP.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleProfileSubmit = async (e) => {
+    e.preventDefault();
+    const tempToken = localStorage.getItem('temp_token');
+    const tempUid = localStorage.getItem('temp_uid');
+
+    try {
+      setLoading(true);
+      setError('');
+
+      // Update email in Firebase Auth first if provided
+      if (profileData.email && auth.currentUser) {
+        try {
+          await updateEmail(auth.currentUser, profileData.email);
+        } catch (firebaseErr) {
+          console.error("Firebase email update failed:", firebaseErr);
+          // If it fails because of sensitive operation, we still proceed with backend
+          // but logging it for debugging
+        }
+      }
+
+      const response = await axios.put(`${import.meta.env.VITE_API_URL}/api/auth/update-profile`, {
+        firebaseUid: tempUid,
+        name: profileData.name,
+        email: profileData.email
+      }, {
+        headers: { 'Authorization': `Bearer ${tempToken}` }
+      });
+
+      const { token, user } = response.data;
+      
+      localStorage.removeItem('temp_token');
+      localStorage.removeItem('temp_uid');
+      
+      login(token, user);
+      navigate('/');
+    } catch (err) {
+      console.error(err);
+      setError('Failed to update profile.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleGoogleLogin = async () => {
     try {
@@ -20,22 +164,23 @@ const Login = () => {
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
       
-      // Send the Firebase ID token to our backend
-      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/google`, {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/firebase-login`, {
         idToken: idToken
       });
       
       const { token, user } = response.data;
-      
-      login(token, user);
-      navigate('/');
+
+      if (!user.name || !user.email) {
+        setStep(3);
+        localStorage.setItem('temp_token', token);
+        localStorage.setItem('temp_uid', user.firebaseUid);
+      } else {
+        login(token, user);
+        navigate('/');
+      }
     } catch (err) {
       console.error(err);
-      if (err.code === 'auth/popup-closed-by-user') {
-        setError('Login cancelled.');
-      } else {
-        setError('Failed to login with Google. Please try again.');
-      }
+      setError('Failed to login with Google.');
     } finally {
       setLoading(false);
     }
@@ -45,30 +190,114 @@ const Login = () => {
     <div className="auth-container">
       <div className="auth-card glass-panel">
         <h2 className="auth-title">Welcome to Klas<span className="gradient-text">zo</span></h2>
-        <p className="auth-subtitle">Sign in to access your premium courses.</p>
         
-        {error && <div className="auth-error">{error}</div>}
+        {step === 1 && <p className="auth-subtitle">Verify your mobile number to get started.</p>}
+        {step === 2 && <p className="auth-subtitle">Enter the 6-digit code sent to {phoneNumber}</p>}
+        {step === 3 && <p className="auth-subtitle">Just one more step! Tell us about yourself.</p>}
         
-        <div className="auth-actions">
-          <button 
-            className="btn-primary auth-btn google-btn" 
-            onClick={handleGoogleLogin}
-            disabled={loading}
-          >
-            <svg viewBox="0 0 48 48" className="google-icon">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24s.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-            </svg>
+        {error && (
+          <div className="auth-error">
+            <AlertCircle size={18} />
+            <span>{error}</span>
+          </div>
+        )}
+        
+        <div id="recaptcha-container"></div>
 
-            {loading ? 'Connecting...' : 'Sign in with Google'}
-          </button>
+        <div className="auth-forms">
+          {step === 1 && (
+            <form onSubmit={handleSendOtp} className="auth-form">
+              <div className="form-group">
+                <label className="form-label">Mobile Number</label>
+                <div className="input-with-icon">
+                  <Phone size={18} className="input-icon" />
+                  <input 
+                    type="tel" 
+                    className="form-control" 
+                    placeholder="+91 98765 43210" 
+                    value={phoneNumber}
+                    onChange={handlePhoneChange}
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" className="btn-primary auth-btn" disabled={loading}>
+                {loading ? 'Sending...' : 'Send OTP'} <ChevronRight size={18} />
+              </button>
+            </form>
+          )}
+
+          {step === 2 && (
+            <form onSubmit={handleVerifyOtp} className="auth-form">
+              <div className="form-group">
+                <label className="form-label">Verification Code</label>
+                <div className="input-with-icon">
+                  <MessageSquare size={18} className="input-icon" />
+                  <input 
+                    type="text" 
+                    className="form-control" 
+                    placeholder="Enter 6-digit OTP" 
+                    value={otp}
+                    onChange={(e) => setOtp(e.target.value)}
+                    maxLength={6}
+                    required
+                  />
+                </div>
+              </div>
+              <button type="submit" className="btn-primary auth-btn" disabled={loading}>
+                {loading ? 'Verifying...' : 'Verify & Login'} <ChevronRight size={18} />
+              </button>
+              <button 
+                type="button" 
+                className="btn-link" 
+                onClick={() => setStep(1)}
+                disabled={loading}
+              >
+                Change Phone Number
+              </button>
+            </form>
+          )}
+
+          {step === 3 && (
+            <form onSubmit={handleProfileSubmit} className="auth-form">
+              <div className="form-group">
+                <label className="form-label">Full Name</label>
+                <div className="input-with-icon">
+                  <User size={18} className="input-icon" />
+                  <input 
+                    type="text" 
+                    className="form-control" 
+                    placeholder="Enter your name" 
+                    value={profileData.name}
+                    onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                    required
+                  />
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Email Address (Optional)</label>
+                <div className="input-with-icon">
+                  <Mail size={18} className="input-icon" />
+                  <input 
+                    type="email" 
+                    className="form-control" 
+                    placeholder="example@email.com (can be left blank)" 
+                    value={profileData.email}
+                    onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                  />
+                </div>
+              </div>
+              <button type="submit" className="btn-primary auth-btn" disabled={loading}>
+                {loading ? 'Finalizing...' : 'Complete Profile'} <ChevronRight size={18} />
+              </button>
+            </form>
+          )}
         </div>
+
+        {/* Google Login removed from step 1 per request */}
       </div>
     </div>
   );
 };
 
 export default Login;
-
