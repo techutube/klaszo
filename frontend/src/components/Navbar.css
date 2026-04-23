@@ -230,6 +230,7 @@
 
 .dropdown-item.logout:hover {
   background: rgba(239, 68, 68, 0.1);
+}
 
 .nav-admin-btn {
   display: flex;
