@@ -1,89 +1,88 @@
-.hero-section {
+.home-hero {
   text-align: center;
-  padding: 4rem 0;
-  margin-bottom: 2rem;
-}
-
-.hero-title {
-  font-size: 3.5rem;
-  line-height: 1.2;
-  margin-bottom: 1rem;
+  padding: 4rem 1.5rem;
+  background: radial-gradient(circle at center, rgba(79, 70, 229, 0.1) 0%, transparent 70%);
 }
 
 .hero-subtitle {
-  font-size: 1.2rem;
+  font-size: 1.25rem;
   color: var(--text-muted);
-  max-width: 600px;
-  margin: 0 auto;
+  max-width: 700px;
+  margin: 0 auto 2rem;
 }
 
 .section-title {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  font-size: 2rem;
-  margin-bottom: 2rem;
-}
-
-.section-icon {
-  color: var(--primary);
+  margin-bottom: 2.5rem;
+  font-size: 1.5rem;
+  text-transform: uppercase;
 }
 
 .courses-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
   gap: 2rem;
+  margin-bottom: 4rem;
 }
 
 .course-card {
+  padding: 2rem;
   display: flex;
   flex-direction: column;
+  height: 100%;
+  transition: all 0.3s ease;
+  position: relative;
   overflow: hidden;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background: var(--surface-color);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .course-card:hover {
-  transform: translateY(-5px);
-  box-shadow: var(--shadow-lg);
-  border-color: rgba(79, 70, 229, 0.3);
+  transform: translateY(-8px);
+  border-color: var(--primary);
+  box-shadow: var(--shadow-glow);
 }
 
-.course-image-placeholder {
-  height: 180px;
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.1), rgba(16, 185, 129, 0.1));
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-bottom: 1px solid var(--glass-border);
-}
-
-.course-placeholder-icon {
-  color: var(--text-muted);
-  opacity: 0.5;
-}
-
-.course-content {
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-  flex: 1;
+.course-icon {
+  color: var(--primary);
+  margin-bottom: 1.5rem;
 }
 
 .course-title {
   font-size: 1.25rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.course-desc {
+.course-description {
   color: var(--text-muted);
-  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+  margin-bottom: 2rem;
   flex: 1;
 }
 
-.course-btn {
+.course-card .btn-primary {
+  align-self: flex-start;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 0.5rem;
-  width: 100%;
+  padding: 0.6rem 1.2rem;
+  font-size: 0.9rem;
+}
+
+/* Specific adjustments for Light Theme if needed */
+.light-theme .course-card {
+  background: #ffffff;
+}
+
+@media (max-width: 768px) {
+  .courses-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .home-hero {
+    padding: 3rem 1rem;
+  }
 }
