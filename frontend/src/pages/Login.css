@@ -133,7 +133,7 @@
 }
 
 #recaptcha-container {
-  display: none;
+  margin: 0;
 }
 
 .grecaptcha-badge { 

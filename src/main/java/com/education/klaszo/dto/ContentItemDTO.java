@@ -14,5 +14,6 @@ public class ContentItemDTO {
     private boolean isFree;
     private Integer durationSeconds;
     private String streamUrl;    // only populated if user is enrolled OR item is free
+    private String sectionType;
     // storageKey is NEVER sent to frontend
 }

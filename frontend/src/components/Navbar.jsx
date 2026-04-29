@@ -26,23 +26,10 @@ const Navbar = () => {
     }
   };
 
-  const handleSendVerification = async () => {
-    try {
-      if (auth.currentUser && user.email) {
-        // This is the most robust method for adding/verifying an email
-        await verifyBeforeUpdateEmail(auth.currentUser, user.email);
-        
-        setVerificationSent(true);
-        setTimeout(() => setVerificationSent(false), 5000);
-      }
-    } catch (err) {
-      console.error("Failed to send verification email", err);
-      if (err.code === 'auth/requires-recent-login') {
-        alert("For security, please sign out and sign in again before verifying your email.");
-        logout(); // Force logout so they can re-authenticate
-      } else {
-        alert("Failed to send verification email. Please ensure Email/Password provider is enabled in Firebase Console.");
-      }
+  const handleLogout = () => {
+    if (window.confirm("Are you sure you want to sign out?")) {
+      logout();
+      setShowDropdown(false);
     }
   };
 
@@ -57,32 +44,8 @@ const Navbar = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const handleLogout = () => {
-    if (window.confirm("Are you sure you want to sign out?")) {
-      logout();
-      setShowDropdown(false);
-    }
-  };
-
   return (
     <header className="navbar-wrapper">
-      {user && user.email && !user.isEmailVerified && (
-        <div className="verification-bar">
-          <div className="container verification-content">
-            <div className="verification-text">
-              <ShieldAlert size={16} />
-              <span>Please verify your email address (<strong>{user.email}</strong>) to secure your account.</span>
-            </div>
-            <button 
-              className="btn-verify-now" 
-              onClick={handleSendVerification}
-              disabled={verificationSent}
-            >
-              {verificationSent ? <><CheckCircle size={14} /> Sent</> : <><Send size={14} /> Verify Now</>}
-            </button>
-          </div>
-        </div>
-      )}
       <div className="navbar glass-panel">
         <div className="container nav-container">
           <Link 
@@ -119,7 +82,11 @@ const Navbar = () => {
                     onClick={() => setShowDropdown(!showDropdown)}
                   >
                     <div className="user-avatar">
-                      {user.name ? user.name.charAt(0).toUpperCase() : <User size={16} />}
+                      {user.profileImage ? (
+                        <img src={user.profileImage} alt={user.name} className="avatar-img" />
+                      ) : (
+                        user.name ? user.name.charAt(0).toUpperCase() : <User size={16} />
+                      )}
                     </div>
                     <span className="user-name">{user.name || 'User'}</span>
                     <ChevronDown size={16} className={showDropdown ? 'rotate' : ''} />
@@ -134,6 +101,14 @@ const Navbar = () => {
 
                       <div className="dropdown-divider"></div>
 
+                      <Link
+                        to="/profile"
+                        className="dropdown-item"
+                        onClick={() => setShowDropdown(false)}
+                      >
+                        <User size={18} /> Profile
+                      </Link>
+
                       {(user.role === 'ADMIN' || user.role === 'OWNER') && (
                         <Link
                           to={isAdminPath ? "/" : "/admin/upload"}
@@ -144,6 +119,8 @@ const Navbar = () => {
                           {isAdminPath ? 'Student View' : 'Admin Panel'}
                         </Link>
                       )}
+
+                      <div className="dropdown-divider"></div>
 
                       <button onClick={handleLogout} className="dropdown-item logout">
                         <LogOut size={18} /> Sign Out

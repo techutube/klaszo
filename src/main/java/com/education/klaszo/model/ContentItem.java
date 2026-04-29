@@ -25,10 +25,17 @@ public class ContentItem {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "chapter_id")
+    private Chapter chapter;
+
     private String title;
 
     @Column(name = "content_type")
     private String contentType;   // "VIDEO" or "PDF"
+
+    @Column(name = "section_type")
+    private String sectionType;   // "NOTES", "DPP", "MIND_MAP", "VIDEO"
 
     @Column(name = "storage_key")
     private String storageKey;    // Cloudflare video ID or R2 key

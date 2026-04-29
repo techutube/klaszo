@@ -49,7 +49,7 @@ public class CourseController {
 
     // GET /api/subjects/{subjectId}/content
     @GetMapping("/subjects/{subjectId}/content")
-    public ResponseEntity<List<ContentItemDTO>> getContent(@PathVariable UUID subjectId) {
+    public ResponseEntity<List<com.education.klaszo.dto.ChapterDTO>> getContent(@PathVariable UUID subjectId) {
         return ResponseEntity.ok(courseService.getContentForSubject(subjectId, currentUserId()));
     }
 }
