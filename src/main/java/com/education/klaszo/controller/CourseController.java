@@ -1,6 +1,5 @@
 package com.education.klaszo.controller;
 
-import com.education.klaszo.dto.ContentItemDTO;
 import com.education.klaszo.dto.CourseDTO;
 import com.education.klaszo.dto.SubjectDTO;
 import com.education.klaszo.model.User;
@@ -12,6 +11,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
