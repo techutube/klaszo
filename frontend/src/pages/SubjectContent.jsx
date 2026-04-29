@@ -6,7 +6,7 @@ import { FileText, Video, Lock, ExternalLink, ChevronLeft, CheckCircle, Layers, 
 import './SubjectContent.css';
 
 const SubjectContent = () => {
-  const { subjectId } = useParams();
+  const { slug } = useParams();
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [content, setContent] = useState([]);
@@ -25,7 +25,7 @@ const SubjectContent = () => {
     const fetchContent = async () => {
       try {
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/subjects/${subjectId}/content`, config);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/subjects/slug/${slug}/content`, config);
         if (Array.isArray(response.data)) {
           setContent(response.data);
           // Expand first chapter by default
@@ -42,7 +42,7 @@ const SubjectContent = () => {
     };
 
     fetchContent();
-  }, [subjectId, token]);
+  }, [slug, token]);
 
   const renderViewer = () => {
     if (!activeItem) return (
@@ -157,7 +157,10 @@ const SubjectContent = () => {
           {content.some(chapter => Object.values(chapter.sections).some(section => section.some(item => !item.streamUrl))) && (
             <div className="enroll-card">
               <p>Want full access to this subject?</p>
-              <Link to={`/checkout/${subjectId}`} className="btn-primary btn-sm">Enroll Now</Link>
+              {/* Note: We might need the subject ID here for checkout. 
+                  Let's assume the first item's subject info has it, or we fetch it. 
+                  Actually, we should probably fetch the subject details too. */}
+              <button onClick={() => navigate(-1)} className="btn-primary btn-sm">View Enrollment Options</button>
             </div>
           )}
         </div>

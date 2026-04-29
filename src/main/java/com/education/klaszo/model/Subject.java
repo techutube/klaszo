@@ -25,6 +25,10 @@ public class Subject {
     private Course course;
 
     private String title;
+
+    @Column(unique = true)
+    private String slug;
+
     private String description;
 
     @Column(name = "price_paise", nullable = false)
@@ -40,6 +44,24 @@ public class Subject {
         }
         if (displayOrder == null) {
             displayOrder = 0;
+        }
+        if (slug == null || slug.trim().isEmpty()) {
+            generateSlug();
+        }
+    }
+
+    @jakarta.persistence.PreUpdate
+    protected void onUpdate() {
+        if (slug == null || slug.trim().isEmpty()) {
+            generateSlug();
+        }
+    }
+
+    private void generateSlug() {
+        if (this.title != null) {
+            this.slug = this.title.toLowerCase()
+                    .replaceAll("[^a-z0-9\\s]", "")
+                    .replaceAll("\\s+", "-");
         }
     }
 }

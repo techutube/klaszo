@@ -6,7 +6,7 @@ import { Book, ChevronRight, ChevronLeft, Lock, PlayCircle, FileText } from 'luc
 import './CourseDetail.css';
 
 const CourseDetail = () => {
-  const { courseId } = useParams();
+  const { slug } = useParams();
   const { user, token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState([]);
@@ -16,7 +16,7 @@ const CourseDetail = () => {
     const fetchSubjects = async () => {
       try {
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/courses/${courseId}/subjects`, config);
+        const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/courses/slug/${slug}/subjects`, config);
         if (Array.isArray(response.data)) {
           setSubjects(response.data);
         } else {
@@ -32,7 +32,7 @@ const CourseDetail = () => {
     };
 
     fetchSubjects();
-  }, [courseId, token]);
+  }, [slug, token]);
 
   return (
     <div className="course-detail-page">
@@ -58,7 +58,7 @@ const CourseDetail = () => {
                 <p className="subject-desc">{subject.description}</p>
                 
                 <div className="subject-actions">
-                  <Link to={`/subject/${subject.id}`} className="btn-secondary view-btn">
+                  <Link to={`/subject/${subject.slug}`} className="btn-secondary view-btn">
                     View Content
                   </Link>
                   

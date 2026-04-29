@@ -54,9 +54,9 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/course/:courseId" element={<CourseDetail />} />
+                <Route path="/course/:slug" element={<CourseDetail />} />
                 <Route path="/checkout/:subjectId" element={<Checkout />} />
-                <Route path="/subject/:subjectId" element={<SubjectContent />} />
+                <Route path="/subject/:slug" element={<SubjectContent />} />
                 <Route path="/profile" element={<Profile />} />
 
                 <Route path="/admin/upload" element={

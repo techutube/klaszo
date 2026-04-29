@@ -12,6 +12,7 @@ import java.util.UUID;
 public class CourseDTO {
     private UUID id;
     private String title;
+    private String slug;
     private String description;
     private String thumbnailUrl;
 }

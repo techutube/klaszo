@@ -34,11 +34,29 @@ public class CourseService {
     @org.springframework.beans.factory.annotation.Value("${cloudflare.r2.public-url}")
     private String publicUrl;
 
+    public CourseDTO getCourseBySlug(String slug) {
+        return courseRepository.findBySlug(slug)
+                .map(c -> new CourseDTO(c.getId(), c.getTitle(), c.getSlug(),
+                        c.getDescription(), c.getThumbnailUrl()))
+                .orElseThrow(() -> new IllegalArgumentException("Course not found"));
+    }
+
+    public SubjectDTO getSubjectBySlug(String slug, UUID userId) {
+        com.education.klaszo.model.Subject s = subjectRepository.findBySlug(slug)
+                .orElseThrow(() -> new IllegalArgumentException("Subject not found"));
+        
+        boolean enrolled = userId != null &&
+                enrollmentRepository.existsByUserIdAndSubjectId(userId, s.getId());
+        
+        return new SubjectDTO(s.getId(), s.getTitle(), s.getSlug(),
+                s.getDescription(), s.getPricePaise(), enrolled);
+    }
+
     // All courses — public, no login needed
     public List<CourseDTO> getAllCourses() {
         return courseRepository.findAllByOrderByTitleAsc()
                 .stream()
-                .map(c -> new CourseDTO(c.getId(), c.getTitle(),
+                .map(c -> new CourseDTO(c.getId(), c.getTitle(), c.getSlug(),
                         c.getDescription(), c.getThumbnailUrl()))
                 .collect(Collectors.toList());
     }
@@ -50,7 +68,7 @@ public class CourseService {
                 .map(s -> {
                     boolean enrolled = userId != null &&
                             enrollmentRepository.existsByUserIdAndSubjectId(userId, s.getId());
-                    return new SubjectDTO(s.getId(), s.getTitle(),
+                    return new SubjectDTO(s.getId(), s.getTitle(), s.getSlug(),
                             s.getDescription(), s.getPricePaise(), enrolled);
                 })
                 .collect(Collectors.toList());
@@ -136,5 +154,24 @@ public class CourseService {
             baseUrl += "/";
         }
         return baseUrl + item.getStorageKey();
+    }
+
+    @org.springframework.transaction.annotation.Transactional
+    public void migrateSlugs() {
+        courseRepository.findAll().forEach(c -> {
+            if (c.getSlug() == null || c.getSlug().isEmpty()) {
+                // The PrePersist/PreUpdate logic is in the model, 
+                // but we can also do it here for clarity.
+                c.setSlug(c.getTitle().toLowerCase().replaceAll("[^a-z0-9\\s]", "").replaceAll("\\s+", "-"));
+                courseRepository.save(c);
+            }
+        });
+
+        subjectRepository.findAll().forEach(s -> {
+            if (s.getSlug() == null || s.getSlug().isEmpty()) {
+                s.setSlug(s.getTitle().toLowerCase().replaceAll("[^a-z0-9\\s]", "").replaceAll("\\s+", "-"));
+                subjectRepository.save(s);
+            }
+        });
     }
 }

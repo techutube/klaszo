@@ -10,6 +10,7 @@ import java.util.UUID;
 public class SubjectDTO {
     private UUID id;
     private String title;
+    private String slug;
     private String description;
     private int pricePaise;
     private boolean enrolled;   // true if the logged-in user has paid

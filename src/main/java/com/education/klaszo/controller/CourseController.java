@@ -47,9 +47,39 @@ public class CourseController {
         return ResponseEntity.ok(courseService.getSubjectsForCourse(courseId, currentUserId()));
     }
 
+    @GetMapping("/courses/slug/{slug}/subjects")
+    public ResponseEntity<List<SubjectDTO>> getSubjectsBySlug(@PathVariable String slug) {
+        CourseDTO course = courseService.getCourseBySlug(slug);
+        return ResponseEntity.ok(courseService.getSubjectsForCourse(course.getId(), currentUserId()));
+    }
+
     // GET /api/subjects/{subjectId}/content
     @GetMapping("/subjects/{subjectId}/content")
     public ResponseEntity<List<com.education.klaszo.dto.ChapterDTO>> getContent(@PathVariable UUID subjectId) {
         return ResponseEntity.ok(courseService.getContentForSubject(subjectId, currentUserId()));
+    }
+
+    @GetMapping("/subjects/slug/{slug}/content")
+    public ResponseEntity<List<com.education.klaszo.dto.ChapterDTO>> getContentBySlug(@PathVariable String slug) {
+        SubjectDTO subject = courseService.getSubjectBySlug(slug, currentUserId());
+        return ResponseEntity.ok(courseService.getContentForSubject(subject.getId(), currentUserId()));
+    }
+
+    // New slug-based endpoints
+    @GetMapping("/courses/slug/{slug}")
+    public ResponseEntity<CourseDTO> getCourseBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(courseService.getCourseBySlug(slug));
+    }
+
+    @GetMapping("/subjects/slug/{slug}")
+    public ResponseEntity<SubjectDTO> getSubjectBySlug(@PathVariable String slug) {
+        return ResponseEntity.ok(courseService.getSubjectBySlug(slug, currentUserId()));
+    }
+
+    // Temporary migration endpoint
+    @PostMapping("/admin/migrate-slugs")
+    public ResponseEntity<?> migrateSlugs() {
+        courseService.migrateSlugs();
+        return ResponseEntity.ok("Slugs migrated successfully");
     }
 }
