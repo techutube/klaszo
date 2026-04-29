@@ -75,11 +75,4 @@ public class CourseController {
     public ResponseEntity<SubjectDTO> getSubjectBySlug(@PathVariable String slug) {
         return ResponseEntity.ok(courseService.getSubjectBySlug(slug, currentUserId()));
     }
-
-    // Temporary migration endpoint
-    @PostMapping("/admin/migrate-slugs")
-    public ResponseEntity<?> migrateSlugs() {
-        courseService.migrateSlugs();
-        return ResponseEntity.ok("Slugs migrated successfully");
-    }
 }

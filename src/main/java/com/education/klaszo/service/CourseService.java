@@ -155,23 +155,4 @@ public class CourseService {
         }
         return baseUrl + item.getStorageKey();
     }
-
-    @org.springframework.transaction.annotation.Transactional
-    public void migrateSlugs() {
-        courseRepository.findAll().forEach(c -> {
-            if (c.getSlug() == null || c.getSlug().isEmpty()) {
-                // The PrePersist/PreUpdate logic is in the model, 
-                // but we can also do it here for clarity.
-                c.setSlug(c.getTitle().toLowerCase().replaceAll("[^a-z0-9\\s]", "").replaceAll("\\s+", "-"));
-                courseRepository.save(c);
-            }
-        });
-
-        subjectRepository.findAll().forEach(s -> {
-            if (s.getSlug() == null || s.getSlug().isEmpty()) {
-                s.setSlug(s.getTitle().toLowerCase().replaceAll("[^a-z0-9\\s]", "").replaceAll("\\s+", "-"));
-                subjectRepository.save(s);
-            }
-        });
-    }
 }
