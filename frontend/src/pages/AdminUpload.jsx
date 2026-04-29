@@ -80,12 +80,18 @@ const AdminUpload = () => {
         displayOrder: 0
       };
 
-      await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/content/chapters`, payload, {
+      const url = chapterForm.id 
+        ? `${import.meta.env.VITE_API_URL}/api/admin/content/chapters/${chapterForm.id}`
+        : `${import.meta.env.VITE_API_URL}/api/admin/content/chapters`;
+      
+      const method = chapterForm.id ? 'put' : 'post';
+
+      await axios[method](url, payload, {
         headers: { 'Authorization': `Bearer ${token}` }
       });
       
-      setMessage({ type: 'success', text: `Chapter created successfully!` });
-      setChapterForm({ ...chapterForm, title: '', description: '' });
+      setMessage({ type: 'success', text: `Chapter ${chapterForm.id ? 'updated' : 'created'} successfully!` });
+      setChapterForm({ ...chapterForm, title: '', description: '', id: null });
       fetchChapters(chapterForm.subjectId);
     } catch (err) {
       setMessage({ type: 'error', text: 'Operation failed.' });
@@ -159,6 +165,17 @@ const AdminUpload = () => {
       description: subject.description, 
       courseId: formData.courseId, 
       id: subject.id 
+    });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleEditChapter = (chapter) => {
+    setChapterForm({ 
+      title: chapter.title, 
+      description: chapter.description, 
+      subjectId: chapterForm.subjectId,
+      courseId: chapterForm.courseId,
+      id: chapter.id 
     });
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -386,7 +403,7 @@ const AdminUpload = () => {
         {activeTab === 'chapter' && (
           <div className="admin-manage-section">
             <form onSubmit={handleCreateOrUpdateChapter} className="admin-form">
-              <h2 className="form-title">Add <span className="gradient-text">Chapter</span></h2>
+              <h2 className="form-title">{chapterForm.id ? 'Update' : 'Add'} <span className="gradient-text">Chapter</span></h2>
               <div className="form-row">
                 <div className="form-group">
                   <label className="form-label">Course</label>
@@ -417,7 +434,14 @@ const AdminUpload = () => {
                 <label className="form-label">Description</label>
                 <textarea className="form-control" rows="2" placeholder="Brief overview..." value={chapterForm.description} onChange={(e) => setChapterForm({...chapterForm, description: e.target.value})} />
               </div>
-              <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'Saving...' : 'Add Chapter'}</button>
+              <div className="form-actions">
+                <button type="submit" className="btn-primary" disabled={loading}>
+                  {loading ? 'Saving...' : (chapterForm.id ? 'Update Chapter' : 'Add Chapter')}
+                </button>
+                {chapterForm.id && (
+                  <button type="button" className="btn-secondary" onClick={() => setChapterForm({...chapterForm, title:'', description:'', id: null})}>Cancel</button>
+                )}
+              </div>
             </form>
 
             {chapterForm.subjectId && (
@@ -429,6 +453,7 @@ const AdminUpload = () => {
                       <div className="item-info">
                         <span className="item-name">{chapter.title}</span>
                       </div>
+                      <button className="edit-btn" onClick={() => handleEditChapter(chapter)}>Edit</button>
                     </div>
                   ))}
                   {chapters.length === 0 && <p className="empty-msg">No chapters found for this subject.</p>}

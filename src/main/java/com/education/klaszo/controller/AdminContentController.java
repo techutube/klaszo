@@ -32,6 +32,18 @@ public class AdminContentController {
         return ResponseEntity.ok(chapterRepository.save(chapter));
     }
 
+    @PutMapping("/chapters/{id}")
+    public ResponseEntity<?> updateChapter(@PathVariable UUID id, @RequestBody com.education.klaszo.model.Chapter chapterDetails) {
+        com.education.klaszo.model.Chapter chapter = chapterRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Chapter not found"));
+        chapter.setTitle(chapterDetails.getTitle());
+        chapter.setDescription(chapterDetails.getDescription());
+        if (chapterDetails.getDisplayOrder() != null) {
+            chapter.setDisplayOrder(chapterDetails.getDisplayOrder());
+        }
+        return ResponseEntity.ok(chapterRepository.save(chapter));
+    }
+
     @GetMapping("/subjects/{subjectId}/chapters")
     public ResponseEntity<?> getChapters(@PathVariable UUID subjectId) {
         return ResponseEntity.ok(chapterRepository.findBySubjectIdOrderByDisplayOrderAsc(subjectId));
