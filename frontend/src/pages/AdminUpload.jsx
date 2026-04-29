@@ -8,13 +8,16 @@ const AdminUpload = () => {
   const { token } = useContext(AuthContext);
   const [courses, setCourses] = useState([]);
   const [subjects, setSubjects] = useState([]);
+  const [chapters, setChapters] = useState([]);
   const [activeTab, setActiveTab] = useState('upload'); 
   
   const [formData, setFormData] = useState({
     courseId: '',
     subjectId: '',
+    chapterId: '',
     title: '',
     contentType: 'PDF',
+    sectionType: 'NOTES',
     price: 0, // In Rupees
     displayOrder: 0,
     file: null
@@ -22,6 +25,7 @@ const AdminUpload = () => {
 
   const [courseForm, setCourseForm] = useState({ title: '', description: '', id: null });
   const [subjectForm, setSubjectForm] = useState({ title: '', description: '', courseId: '', id: null });
+  const [chapterForm, setChapterForm] = useState({ title: '', description: '', subjectId: '', courseId: '', id: null });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
@@ -43,10 +47,51 @@ const AdminUpload = () => {
       .catch(err => console.error("Failed to fetch subjects", err));
   };
 
+  const fetchChapters = (subjectId) => {
+    if (!subjectId) return;
+    axios.get(`${import.meta.env.VITE_API_URL}/api/admin/content/subjects/${subjectId}/chapters`, {
+      headers: { 'Authorization': `Bearer ${token}` }
+    })
+      .then(res => setChapters(res.data))
+      .catch(err => console.error("Failed to fetch chapters", err));
+  };
+
   const handleCourseChange = (e) => {
     const courseId = e.target.value;
-    setFormData({ ...formData, courseId, subjectId: '' });
+    setFormData({ ...formData, courseId, subjectId: '', chapterId: '' });
     fetchSubjects(courseId);
+    setChapters([]);
+  };
+
+  const handleSubjectChange = (e) => {
+    const subjectId = e.target.value;
+    setFormData({ ...formData, subjectId, chapterId: '' });
+    fetchChapters(subjectId);
+  };
+
+  const handleCreateOrUpdateChapter = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const payload = {
+        title: chapterForm.title,
+        description: chapterForm.description,
+        subject: { id: chapterForm.subjectId },
+        displayOrder: 0
+      };
+
+      await axios.post(`${import.meta.env.VITE_API_URL}/api/admin/content/chapters`, payload, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      setMessage({ type: 'success', text: `Chapter created successfully!` });
+      setChapterForm({ ...chapterForm, title: '', description: '' });
+      fetchChapters(chapterForm.subjectId);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Operation failed.' });
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleCreateOrUpdateCourse = async (e) => {
@@ -128,8 +173,10 @@ const AdminUpload = () => {
     const data = new FormData();
     data.append('file', formData.file);
     data.append('subjectId', formData.subjectId);
+    if (formData.chapterId) data.append('chapterId', formData.chapterId);
     data.append('title', formData.title);
     data.append('contentType', formData.contentType);
+    data.append('sectionType', formData.sectionType);
     data.append('pricePaise', Math.round(formData.price * 100)); // Convert to Paise
     data.append('displayOrder', formData.displayOrder);
 
@@ -156,13 +203,16 @@ const AdminUpload = () => {
     <div className="admin-container">
       <div className="admin-tabs">
         <button className={`tab-btn ${activeTab === 'upload' ? 'active' : ''}`} onClick={() => setActiveTab('upload')}>
-          <Upload size={18} /> Content
+          <Upload size={18} /> <span>Content</span>
         </button>
         <button className={`tab-btn ${activeTab === 'course' ? 'active' : ''}`} onClick={() => setActiveTab('course')}>
-          <PlusCircle size={18} /> Courses
+          <PlusCircle size={18} /> <span>Courses</span>
         </button>
         <button className={`tab-btn ${activeTab === 'subject' ? 'active' : ''}`} onClick={() => setActiveTab('subject')}>
-          <Layers size={18} /> Subjects
+          <Layers size={18} /> <span>Subjects</span>
+        </button>
+        <button className={`tab-btn ${activeTab === 'chapter' ? 'active' : ''}`} onClick={() => setActiveTab('chapter')}>
+          <BookOpen size={18} /> <span>Chapters</span>
         </button>
       </div>
 
@@ -187,19 +237,37 @@ const AdminUpload = () => {
               </div>
               <div className="form-group">
                 <label className="form-label">Subject</label>
-                <select className="form-control" value={formData.subjectId} onChange={(e) => setFormData({...formData, subjectId: e.target.value})} required disabled={!formData.courseId}>
+                <select className="form-control" value={formData.subjectId} onChange={handleSubjectChange} required disabled={!formData.courseId}>
                   <option value="">Select Subject</option>
                   {subjects.map(subject => <option key={subject.id} value={subject.id}>{subject.title}</option>)}
                 </select>
               </div>
-            </div>
-            <div className="form-group">
-              <label className="form-label">Content Title</label>
-              <input type="text" className="form-control" placeholder="e.g. Chapter 1: Introduction" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+              <div className="form-group">
+                <label className="form-label">Chapter</label>
+                <select className="form-control" value={formData.chapterId} onChange={(e) => setFormData({...formData, chapterId: e.target.value})} disabled={!formData.subjectId}>
+                  <option value="">No Chapter (General)</option>
+                  {chapters.map(chapter => <option key={chapter.id} value={chapter.id}>{chapter.title}</option>)}
+                </select>
+              </div>
             </div>
             <div className="form-row">
               <div className="form-group">
-                <label className="form-label">Content Type</label>
+                <label className="form-label">Content Title</label>
+                <input type="text" className="form-control" placeholder="e.g. Intro to Calculus" value={formData.title} onChange={(e) => setFormData({...formData, title: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Section Type</label>
+                <select className="form-control" value={formData.sectionType} onChange={(e) => setFormData({...formData, sectionType: e.target.value})}>
+                  <option value="VIDEO">Video Lecture</option>
+                  <option value="NOTES">Revision Notes</option>
+                  <option value="DPP">Daily Practice Paper (DPP)</option>
+                  <option value="MIND_MAP">Mind Map</option>
+                </select>
+              </div>
+            </div>
+            <div className="form-row">
+              <div className="form-group">
+                <label className="form-label">Content Format</label>
                 <div className="radio-group">
                   <label className={`radio-label ${formData.contentType === 'PDF' ? 'active' : ''}`}>
                     <input type="radio" value="PDF" checked={formData.contentType === 'PDF'} onChange={(e) => setFormData({...formData, contentType: e.target.value})} /> <FileText size={18} /> PDF
@@ -237,7 +305,7 @@ const AdminUpload = () => {
               </div>
               <div className="form-group">
                 <label className="form-label">Description</label>
-                <textarea className="form-control" rows="3" placeholder="Course overview..." value={courseForm.description} onChange={(e) => setCourseForm({...courseForm, description: e.target.value})} required />
+                <textarea className="form-control" rows="3" placeholder="Course overview..." value={courseForm.description} onChange={(e) => setCourseForm({...courseForm, description: e.target.value})} />
               </div>
               <div className="form-actions">
                 <button type="submit" className="btn-primary" disabled={loading}>
@@ -285,7 +353,7 @@ const AdminUpload = () => {
               </div>
               <div className="form-group">
                 <label className="form-label">Description</label>
-                <textarea className="form-control" rows="3" placeholder="Subject details..." value={subjectForm.description} onChange={(e) => setSubjectForm({...subjectForm, description: e.target.value})} required />
+                <textarea className="form-control" rows="3" placeholder="Subject details..." value={subjectForm.description} onChange={(e) => setSubjectForm({...subjectForm, description: e.target.value})} />
               </div>
               <div className="form-actions">
                 <button type="submit" className="btn-primary" disabled={loading}>
@@ -310,6 +378,60 @@ const AdminUpload = () => {
                     </div>
                   ))}
                   {subjects.length === 0 && <p className="empty-msg">No subjects found for this course.</p>}
+                </div>
+              </div>
+            )}
+          </div>
+        )}
+        {activeTab === 'chapter' && (
+          <div className="admin-manage-section">
+            <form onSubmit={handleCreateOrUpdateChapter} className="admin-form">
+              <h2 className="form-title">Add <span className="gradient-text">Chapter</span></h2>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Course</label>
+                  <select className="form-control" value={chapterForm.courseId} onChange={(e) => {
+                    setChapterForm({...chapterForm, courseId: e.target.value});
+                    fetchSubjects(e.target.value);
+                  }} required>
+                    <option value="">Select Course</option>
+                    {courses.map(course => <option key={course.id} value={course.id}>{course.title}</option>)}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Subject</label>
+                  <select className="form-control" value={chapterForm.subjectId} onChange={(e) => {
+                    setChapterForm({...chapterForm, subjectId: e.target.value});
+                    fetchChapters(e.target.value);
+                  }} required disabled={!chapterForm.courseId}>
+                    <option value="">Select Subject</option>
+                    {subjects.map(subject => <option key={subject.id} value={subject.id}>{subject.title}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="form-group">
+                <label className="form-label">Chapter Title</label>
+                <input type="text" className="form-control" placeholder="e.g. Chapter 1: Number Systems" value={chapterForm.title} onChange={(e) => setChapterForm({...chapterForm, title: e.target.value})} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Description</label>
+                <textarea className="form-control" rows="2" placeholder="Brief overview..." value={chapterForm.description} onChange={(e) => setChapterForm({...chapterForm, description: e.target.value})} />
+              </div>
+              <button type="submit" className="btn-primary" disabled={loading}>{loading ? 'Saving...' : 'Add Chapter'}</button>
+            </form>
+
+            {chapterForm.subjectId && (
+              <div className="items-list-container">
+                <h3 className="list-title">Chapters in this Subject</h3>
+                <div className="items-grid">
+                  {chapters.map(chapter => (
+                    <div key={chapter.id} className="item-row glass-panel">
+                      <div className="item-info">
+                        <span className="item-name">{chapter.title}</span>
+                      </div>
+                    </div>
+                  ))}
+                  {chapters.length === 0 && <p className="empty-msg">No chapters found for this subject.</p>}
                 </div>
               </div>
             )}

@@ -24,7 +24,18 @@ public class AdminContentController {
     private final ContentItemRepository contentItemRepository;
     private final SubjectRepository subjectRepository;
     private final CourseRepository courseRepository;
+    private final com.education.klaszo.repository.ChapterRepository chapterRepository;
     private final FileStorageService fileStorageService;
+
+    @PostMapping("/chapters")
+    public ResponseEntity<?> createChapter(@RequestBody com.education.klaszo.model.Chapter chapter) {
+        return ResponseEntity.ok(chapterRepository.save(chapter));
+    }
+
+    @GetMapping("/subjects/{subjectId}/chapters")
+    public ResponseEntity<?> getChapters(@PathVariable UUID subjectId) {
+        return ResponseEntity.ok(chapterRepository.findBySubjectIdOrderByDisplayOrderAsc(subjectId));
+    }
 
     @PostMapping("/courses")
     public ResponseEntity<?> createCourse(@RequestBody Course course) {
@@ -61,8 +72,10 @@ public class AdminContentController {
     public ResponseEntity<?> uploadContent(
             @RequestParam("file") MultipartFile file,
             @RequestParam("subjectId") UUID subjectId,
+            @RequestParam(value = "chapterId", required = false) UUID chapterId,
             @RequestParam("title") String title,
             @RequestParam("contentType") String contentType,
+            @RequestParam(value = "sectionType", defaultValue = "NOTES") String sectionType,
             @RequestParam(value = "pricePaise", defaultValue = "0") Integer pricePaise,
             @RequestParam(value = "displayOrder", defaultValue = "0") int displayOrder
     ) {
@@ -74,8 +87,16 @@ public class AdminContentController {
 
             ContentItem contentItem = new ContentItem();
             contentItem.setSubject(subject);
+            
+            if (chapterId != null) {
+                com.education.klaszo.model.Chapter chapter = chapterRepository.findById(chapterId)
+                        .orElseThrow(() -> new IllegalArgumentException("Chapter not found"));
+                contentItem.setChapter(chapter);
+            }
+
             contentItem.setTitle(title);
             contentItem.setContentType(contentType);
+            contentItem.setSectionType(sectionType);
             contentItem.setStorageKey(fileName);
             contentItem.setPricePaise(pricePaise);
             contentItem.setDisplayOrder(displayOrder);

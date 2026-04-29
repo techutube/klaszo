@@ -26,4 +26,11 @@ public class Chapter {
 
     @Column(name = "display_order", nullable = false)
     private Integer displayOrder = 0;
+
+    @PrePersist
+    protected void onCreate() {
+        if (displayOrder == null) {
+            displayOrder = 0;
+        }
+    }
 }

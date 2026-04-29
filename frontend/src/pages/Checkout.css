@@ -30,7 +30,8 @@
 }
 
 .checkout-details {
-  background: rgba(15, 23, 42, 0.4);
+  background: var(--input-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   padding: 1.5rem;
   margin-bottom: 2rem;

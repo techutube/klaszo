@@ -28,9 +28,15 @@
 }
 
 .tab-btn.active {
-  background: var(--primary);
-  color: white;
-  border-color: var(--primary);
+  background: var(--primary) !important;
+  color: #ffffff !important;
+  border-color: var(--primary) !important;
+  opacity: 1 !important;
+}
+
+.tab-btn.active svg, 
+.tab-btn.active span {
+  color: #ffffff !important;
 }
 
 .admin-card {
@@ -84,7 +90,8 @@
   justify-content: space-between;
   align-items: center;
   padding: 0.75rem 1.25rem;
-  background: rgba(15, 23, 42, 0.3);
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   border-radius: var(--radius-md);
   transition: all 0.2s;
 }
@@ -149,7 +156,7 @@
   border-radius: var(--radius-md);
   cursor: pointer;
   transition: all 0.2s;
-  background: rgba(15, 23, 42, 0.2);
+  background: var(--input-bg);
 }
 
 .radio-label:hover {

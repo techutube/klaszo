@@ -24,6 +24,9 @@ const Login = () => {
   const { login } = useContext(AuthContext);
 
   useEffect(() => {
+    // Apply default browser language for SMS and reCAPTCHA
+    auth.useDeviceLanguage();
+    
     return () => {
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
@@ -31,12 +34,23 @@ const Login = () => {
     };
   }, []);
 
-  const setupRecaptcha = () => {
-    if (!window.recaptchaVerifier) {
-      window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-        'size': 'invisible',
-        'callback': (response) => {}
-      });
+  const setupRecaptcha = async () => {
+    try {
+      if (!window.recaptchaVerifier) {
+        window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
+          'size': 'invisible',
+          'callback': (response) => {
+            // reCAPTCHA solved
+          },
+          'expired-callback': () => {
+            setError('reCAPTCHA expired. Please try again.');
+          }
+        });
+        await window.recaptchaVerifier.render();
+      }
+    } catch (err) {
+      console.error("Recaptcha initialization error", err);
+      setError("Failed to initialize security check. Please refresh.");
     }
   };
 
@@ -58,7 +72,7 @@ const Login = () => {
     try {
       setLoading(true);
       setError('');
-      setupRecaptcha();
+      await setupRecaptcha();
       
       const appVerifier = window.recaptchaVerifier;
       const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
@@ -66,8 +80,17 @@ const Login = () => {
       setVerificationId(confirmationResult);
       setStep(2);
     } catch (err) {
-      console.error(err);
-      setError('Failed to send OTP. Please check the number.');
+      console.error("Phone Auth Error:", err.code, err.message);
+      if (err.code === 'auth/invalid-phone-number') {
+        setError('The phone number is invalid. Please use E.164 format (e.g. +91 9876543210).');
+      } else if (err.code === 'auth/quota-exceeded') {
+        setError('SMS quota exceeded. Please try again later.');
+      } else if (err.code === 'auth/too-many-requests') {
+        setError('Too many requests. Please wait a while before trying again.');
+      } else {
+        setError('Failed to send OTP. Please try again.');
+      }
+      
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
         window.recaptchaVerifier = null;
@@ -103,13 +126,20 @@ const Login = () => {
         setStep(3);
         localStorage.setItem('temp_token', token);
         localStorage.setItem('temp_uid', user.firebaseUid);
+        localStorage.setItem('temp_timestamp', Date.now());
       } else {
         login(token, user);
         navigate('/');
       }
     } catch (err) {
-      console.error(err);
-      setError('Invalid OTP.');
+      console.error("OTP Verification Error:", err.code, err.message);
+      if (err.code === 'auth/invalid-verification-code') {
+        setError('The OTP you entered is incorrect. Please try again.');
+      } else if (err.code === 'auth/code-expired') {
+        setError('The OTP has expired. Please request a new one.');
+      } else {
+        setError('Failed to verify OTP. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
@@ -147,6 +177,7 @@ const Login = () => {
       
       localStorage.removeItem('temp_token');
       localStorage.removeItem('temp_uid');
+      localStorage.removeItem('temp_timestamp');
       
       login(token, user);
       navigate('/');
@@ -172,7 +203,7 @@ const Login = () => {
       
       const { token, user } = response.data;
 
-      if (!user.name || !user.email) {
+      if (!user.name) {
         setStep(3);
         localStorage.setItem('temp_token', token);
         localStorage.setItem('temp_uid', user.firebaseUid);

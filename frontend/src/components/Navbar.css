@@ -16,55 +16,24 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
 }
 
-.verification-bar {
-  background: linear-gradient(to right, #4F46E5, #7C3AED);
+.user-avatar {
+  width: 28px;
+  height: 28px;
+  background: var(--primary);
   color: white;
-  padding: 0.6rem 0;
-  font-size: 0.875rem;
-}
-
-.verification-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 1rem;
-}
-
-.verification-text {
+  border-radius: 50%;
   display: flex;
   align-items: center;
-  gap: 0.5rem;
-}
-
-.btn-verify-now {
-  background: rgba(255, 255, 255, 0.2);
-  border: 1px solid rgba(255, 255, 255, 0.3);
-  color: white;
-  padding: 0.3rem 0.8rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
+  justify-content: center;
   font-weight: 600;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  overflow: hidden; /* For avatar image */
 }
 
-.btn-verify-now:hover:not(:disabled) {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-.btn-verify-now:disabled {
-  opacity: 0.8;
-  cursor: default;
-}
-
-@media (max-width: 768px) {
-  .verification-content {
-    flex-direction: column;
-    text-align: center;
-    gap: 0.5rem;
-  }
+.avatar-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 .nav-container {
@@ -145,18 +114,7 @@
   background: var(--surface-hover);
 }
 
-.user-avatar {
-  width: 28px;
-  height: 28px;
-  background: var(--primary);
-  color: white;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 0.875rem;
-}
+
 
 .user-name {
   font-weight: 500;
