@@ -196,3 +196,36 @@
   gap: 0.5rem;
   padding: 0.5rem 1rem;
 }
+
+@media (max-width: 768px) {
+  .nav-container {
+    height: 80px;
+    padding: 0 1rem;
+  }
+  
+  .brand-logo {
+    height: 55px;
+  }
+  
+  .nav-actions {
+    gap: 0.75rem;
+  }
+  
+  .theme-toggle {
+    width: 35px;
+    height: 35px;
+  }
+  
+  .user-profile-trigger {
+    padding: 0.3rem 0.6rem;
+  }
+  
+  .user-name {
+    display: none; /* Hide name on small mobile to save space */
+  }
+  
+  .btn-primary, .btn-secondary {
+    padding: 0.5rem 1rem;
+    font-size: 0.85rem;
+  }
+}

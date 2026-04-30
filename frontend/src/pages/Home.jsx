@@ -33,7 +33,7 @@ const Home = () => {
     <div className="home-container">
       <div className="hero-section">
         <h1 className="hero-title">
-          Master your future with <span className="gradient-text">Klaszo</span>
+          Master your future with <span className="gradient-text brand-font">Klaszo</span>
         </h1>
         <p className="hero-subtitle">
           Premium courses designed to help you excel in your board exams and competitive entrances.

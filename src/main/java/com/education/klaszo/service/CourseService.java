@@ -49,7 +49,7 @@ public class CourseService {
                 enrollmentRepository.existsByUserIdAndSubjectId(userId, s.getId());
         
         return new SubjectDTO(s.getId(), s.getTitle(), s.getSlug(),
-                s.getDescription(), s.getPricePaise(), enrolled);
+                s.getDescription(), s.getCourse().getTitle(), s.getPricePaise(), enrolled);
     }
 
     // All courses — public, no login needed
@@ -69,7 +69,7 @@ public class CourseService {
                     boolean enrolled = userId != null &&
                             enrollmentRepository.existsByUserIdAndSubjectId(userId, s.getId());
                     return new SubjectDTO(s.getId(), s.getTitle(), s.getSlug(),
-                            s.getDescription(), s.getPricePaise(), enrolled);
+                            s.getDescription(), s.getCourse().getTitle(), s.getPricePaise(), enrolled);
                 })
                 .collect(Collectors.toList());
     }

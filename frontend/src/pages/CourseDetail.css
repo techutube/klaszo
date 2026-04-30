@@ -18,7 +18,7 @@
 }
 
 .course-detail-page {
-  padding: 3rem 0;
+  padding: 3rem 1.5rem;
 }
 
 .detail-header {
@@ -29,6 +29,12 @@
 .detail-title {
   font-size: 2.5rem;
   margin-bottom: 1rem;
+}
+
+.course-name-breadcrumb {
+  color: var(--text-muted);
+  font-weight: 400;
+  font-size: 0.7em;
 }
 
 .detail-subtitle {

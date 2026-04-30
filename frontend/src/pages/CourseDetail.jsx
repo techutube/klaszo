@@ -10,28 +10,30 @@ const CourseDetail = () => {
   const { user, token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [subjects, setSubjects] = useState([]);
+  const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchSubjects = async () => {
+    const fetchCourseData = async () => {
       try {
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/courses/slug/${slug}/subjects`, config);
-        if (Array.isArray(response.data)) {
-          setSubjects(response.data);
-        } else {
-          console.error("API response for subjects is not an array:", response.data);
-          setSubjects([]);
-        }
+        
+        // Fetch subjects
+        const subjectsRes = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/courses/slug/${slug}/subjects`, config);
+        setSubjects(Array.isArray(subjectsRes.data) ? subjectsRes.data : []);
+        
+        // Fetch course details
+        const courseRes = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/courses/slug/${slug}`, config);
+        setCourse(courseRes.data);
       } catch (error) {
-        console.error("Error fetching subjects", error);
+        console.error("Error fetching course data", error);
         setSubjects([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSubjects();
+    fetchCourseData();
   }, [slug, token]);
 
   return (
@@ -40,7 +42,10 @@ const CourseDetail = () => {
         <ChevronLeft size={20} /> Back to Courses
       </button>
       <div className="detail-header">
-        <h1 className="detail-title">Choose your <span className="gradient-text">Subject</span></h1>
+        <h1 className="detail-title">
+          {course ? <span className="course-name-breadcrumb">{course.title} / </span> : null}
+          Choose your <span className="gradient-text">Subject</span>
+        </h1>
         <p className="detail-subtitle">Select a subject to access study materials, notes, and video lectures.</p>
       </div>
 

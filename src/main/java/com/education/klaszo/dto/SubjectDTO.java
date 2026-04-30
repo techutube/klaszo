@@ -12,6 +12,7 @@ public class SubjectDTO {
     private String title;
     private String slug;
     private String description;
+    private String courseTitle;
     private int pricePaise;
     private boolean enrolled;   // true if the logged-in user has paid
 }

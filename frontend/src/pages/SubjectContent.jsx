@@ -10,6 +10,7 @@ const SubjectContent = () => {
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [content, setContent] = useState([]);
+  const [subject, setSubject] = useState(null);
   const [loading, setLoading] = useState(true);
   const [expandedChapters, setExpandedChapters] = useState({});
   const [activeItem, setActiveItem] = useState(null);
@@ -22,26 +23,31 @@ const SubjectContent = () => {
   };
 
   useEffect(() => {
-    const fetchContent = async () => {
+    const fetchData = async () => {
       try {
         const config = token ? { headers: { Authorization: `Bearer ${token}` } } : {};
-        const response = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/subjects/slug/${slug}/content`, config);
-        if (Array.isArray(response.data)) {
-          setContent(response.data);
-          // Expand first chapter by default
-          if (response.data.length > 0) {
-            setExpandedChapters({ [response.data[0].id]: true });
+        
+        // Fetch content
+        const contentRes = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/subjects/slug/${slug}/content`, config);
+        if (Array.isArray(contentRes.data)) {
+          setContent(contentRes.data);
+          if (contentRes.data.length > 0) {
+            setExpandedChapters({ [contentRes.data[0].id]: true });
           }
         }
+        
+        // Fetch subject details
+        const subjectRes = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/subjects/slug/${slug}`, config);
+        setSubject(subjectRes.data);
       } catch (error) {
-        console.error("Error fetching content", error);
+        console.error("Error fetching subject data", error);
         setContent([]);
       } finally {
         setLoading(false);
       }
     };
 
-    fetchContent();
+    fetchData();
   }, [slug, token]);
 
   const renderViewer = () => {
@@ -99,9 +105,18 @@ const SubjectContent = () => {
 
   return (
     <div className="subject-content-page">
-      <button onClick={() => navigate(-1)} className="back-link">
-        <ChevronLeft size={20} /> Back
-      </button>
+      <div className="content-header">
+        <button onClick={() => navigate(-1)} className="back-link">
+          <ChevronLeft size={20} /> Back
+        </button>
+        {subject && (
+          <div className="breadcrumb">
+            <span className="course-name">{subject.courseTitle}</span>
+            <ChevronRight size={16} />
+            <span className="subject-name">{subject.title}</span>
+          </div>
+        )}
+      </div>
       
       <div className="content-layout">
         <div className="content-sidebar glass-panel">

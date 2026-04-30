@@ -111,6 +111,11 @@ button {
   font-weight: 500;
   transition: all 0.3s ease;
   box-shadow: var(--shadow-md);
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .btn-primary:hover {
@@ -126,6 +131,11 @@ button {
   border-radius: var(--radius-md);
   font-weight: 500;
   transition: all 0.3s ease;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
 }
 
 .btn-secondary:hover {
@@ -168,6 +178,11 @@ button {
   background-clip: text;
 }
 
+.brand-font {
+  font-family: 'Ethnocentric rg', sans-serif;
+  letter-spacing: 0.05em;
+}
+
 .app-wrapper {
   display: flex;
   flex-direction: column;
@@ -176,7 +191,7 @@ button {
 
 .main-content {
   flex: 1;
-  padding: 2rem 0;
+  padding: 2rem 1.5rem;
 }.courses-grid {
   display: grid !important;
   grid-template-columns: repeat(2, 1fr) !important;
