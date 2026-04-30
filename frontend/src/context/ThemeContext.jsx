@@ -10,14 +10,17 @@ export const ThemeProvider = ({ children }) => {
 
   useEffect(() => {
     const root = window.document.documentElement;
+    const favicon = document.querySelector('link[rel="icon"]');
     if (isDarkMode) {
       root.classList.add('dark-theme');
       root.classList.remove('light-theme');
       localStorage.setItem('theme', 'dark');
+      if (favicon) favicon.href = "/logo-dark.png";
     } else {
       root.classList.add('light-theme');
       root.classList.remove('dark-theme');
       localStorage.setItem('theme', 'light');
+      if (favicon) favicon.href = "/logo-white.png";
     }
   }, [isDarkMode]);
 

@@ -20,9 +20,11 @@ const Navbar = () => {
   // Logo selection logic
   const getLogoSrc = () => {
     if (isDarkMode) {
-      return isLogoHovered ? "/logo-dark.png" : "/logo-white.png";
-    } else {
+      // In dark theme: logo-dark.png is the white logo (base), logo-white.png is the dark logo (hover)
       return isLogoHovered ? "/logo-white.png" : "/logo-dark.png";
+    } else {
+      // In light theme: logo-white.png is the dark logo (base), logo-dark.png is the white logo (hover)
+      return isLogoHovered ? "/logo-dark.png" : "/logo-white.png";
     }
   };
 
@@ -48,9 +50,9 @@ const Navbar = () => {
     <header className="navbar-wrapper">
       <div className="navbar glass-panel">
         <div className="container nav-container">
-          <Link 
-            to="/" 
-            className="brand" 
+          <Link
+            to="/"
+            className="brand"
             onClick={() => setShowDropdown(false)}
             onMouseEnter={() => setIsLogoHovered(true)}
             onMouseLeave={() => setIsLogoHovered(false)}

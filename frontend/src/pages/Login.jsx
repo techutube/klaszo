@@ -5,6 +5,7 @@ import { auth, googleProvider } from '../firebase';
 import { signInWithPopup, RecaptchaVerifier, signInWithPhoneNumber, updateEmail } from 'firebase/auth';
 import { AuthContext } from '../context/AuthContext';
 import { Phone, MessageSquare, User, Mail, ChevronRight, AlertCircle } from 'lucide-react';
+import { ThemeContext } from '../context/ThemeContext';
 import './Login.css';
 
 const Login = () => {
@@ -12,7 +13,7 @@ const Login = () => {
   const [phoneNumber, setPhoneNumber] = useState('+91 ');
   const [otp, setOtp] = useState('');
   const [verificationId, setVerificationId] = useState(null);
-  
+
   const [profileData, setProfileData] = useState({
     name: '',
     email: ''
@@ -22,11 +23,22 @@ const Login = () => {
   const [error, setError] = useState('');
   const navigate = useNavigate();
   const { login } = useContext(AuthContext);
+  const { isDarkMode } = useContext(ThemeContext);
+  const [isLogoHovered, setIsLogoHovered] = useState(false);
+
+  // Logo selection logic
+  const getLogoSrc = () => {
+    if (isDarkMode) {
+      return isLogoHovered ? "/logo-white.png" : "/logo-dark.png";
+    } else {
+      return isLogoHovered ? "/logo-dark.png" : "/logo-white.png";
+    }
+  };
 
   useEffect(() => {
     // Apply default browser language for SMS and reCAPTCHA
     auth.useDeviceLanguage();
-    
+
     return () => {
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
@@ -73,10 +85,10 @@ const Login = () => {
       setLoading(true);
       setError('');
       await setupRecaptcha();
-      
+
       const appVerifier = window.recaptchaVerifier;
       const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
-      
+
       setVerificationId(confirmationResult);
       setStep(2);
     } catch (err) {
@@ -90,7 +102,7 @@ const Login = () => {
       } else {
         setError('Failed to send OTP. Please try again.');
       }
-      
+
       if (window.recaptchaVerifier) {
         window.recaptchaVerifier.clear();
         window.recaptchaVerifier = null;
@@ -110,16 +122,16 @@ const Login = () => {
     try {
       setLoading(true);
       setError('');
-      
+
       const result = await verificationId.confirm(otp);
       const idToken = await result.user.getIdToken();
-      
+
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/firebase-login`, {
         idToken: idToken
       });
-      
+
       const { token, user } = response.data;
-      
+
       // Only ask for profile if user has never set their name (first-time signup)
       // Email is optional, so don't re-prompt just because it's missing
       if (!user.name) {
@@ -174,11 +186,11 @@ const Login = () => {
       });
 
       const { token, user } = response.data;
-      
+
       localStorage.removeItem('temp_token');
       localStorage.removeItem('temp_uid');
       localStorage.removeItem('temp_timestamp');
-      
+
       login(token, user);
       navigate('/');
     } catch (err) {
@@ -193,14 +205,14 @@ const Login = () => {
     try {
       setLoading(true);
       setError('');
-      
+
       const result = await signInWithPopup(auth, googleProvider);
       const idToken = await result.user.getIdToken();
-      
+
       const response = await axios.post(`${import.meta.env.VITE_API_URL}/api/auth/firebase-login`, {
         idToken: idToken
       });
-      
+
       const { token, user } = response.data;
 
       if (!user.name) {
@@ -222,19 +234,27 @@ const Login = () => {
   return (
     <div className="auth-container">
       <div className="auth-card glass-panel">
+        <div 
+          className="auth-logo-wrapper"
+          onMouseEnter={() => setIsLogoHovered(true)}
+          onMouseLeave={() => setIsLogoHovered(false)}
+          onClick={() => navigate('/')}
+        >
+          <img src={getLogoSrc()} alt="Klaszo Logo" className="auth-logo" />
+        </div>
         <h2 className="auth-title">Welcome to Klas<span className="gradient-text">zo</span></h2>
-        
+
         {step === 1 && <p className="auth-subtitle">Verify your mobile number to get started.</p>}
         {step === 2 && <p className="auth-subtitle">Enter the 6-digit code sent to {phoneNumber}</p>}
         {step === 3 && <p className="auth-subtitle">Just one more step! Tell us about yourself.</p>}
-        
+
         {error && (
           <div className="auth-error">
             <AlertCircle size={18} />
             <span>{error}</span>
           </div>
         )}
-        
+
         <div id="recaptcha-container"></div>
 
         <div className="auth-forms">
@@ -244,10 +264,10 @@ const Login = () => {
                 <label className="form-label">Mobile Number</label>
                 <div className="input-with-icon">
                   <Phone size={18} className="input-icon" />
-                  <input 
-                    type="tel" 
-                    className="form-control" 
-                    placeholder="+91 98765 43210" 
+                  <input
+                    type="tel"
+                    className="form-control"
+                    placeholder="+91 98765 43210"
                     value={phoneNumber}
                     onChange={handlePhoneChange}
                     required
@@ -266,10 +286,10 @@ const Login = () => {
                 <label className="form-label">Verification Code</label>
                 <div className="input-with-icon">
                   <MessageSquare size={18} className="input-icon" />
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="Enter 6-digit OTP" 
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter 6-digit OTP"
                     value={otp}
                     onChange={(e) => setOtp(e.target.value)}
                     maxLength={6}
@@ -280,9 +300,9 @@ const Login = () => {
               <button type="submit" className="btn-primary auth-btn" disabled={loading}>
                 {loading ? 'Verifying...' : 'Verify & Login'} <ChevronRight size={18} />
               </button>
-              <button 
-                type="button" 
-                className="btn-link" 
+              <button
+                type="button"
+                className="btn-link"
                 onClick={() => setStep(1)}
                 disabled={loading}
               >
@@ -297,12 +317,12 @@ const Login = () => {
                 <label className="form-label">Full Name</label>
                 <div className="input-with-icon">
                   <User size={18} className="input-icon" />
-                  <input 
-                    type="text" 
-                    className="form-control" 
-                    placeholder="Enter your name" 
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="Enter your name"
                     value={profileData.name}
-                    onChange={(e) => setProfileData({...profileData, name: e.target.value})}
+                    onChange={(e) => setProfileData({ ...profileData, name: e.target.value })}
                     required
                   />
                 </div>
@@ -311,12 +331,12 @@ const Login = () => {
                 <label className="form-label">Email Address (Optional)</label>
                 <div className="input-with-icon">
                   <Mail size={18} className="input-icon" />
-                  <input 
-                    type="email" 
-                    className="form-control" 
-                    placeholder="example@email.com (can be left blank)" 
+                  <input
+                    type="email"
+                    className="form-control"
+                    placeholder="example@email.com (can be left blank)"
                     value={profileData.email}
-                    onChange={(e) => setProfileData({...profileData, email: e.target.value})}
+                    onChange={(e) => setProfileData({ ...profileData, email: e.target.value })}
                   />
                 </div>
               </div>
@@ -329,7 +349,7 @@ const Login = () => {
                 disabled={loading}
                 onClick={() => {
                   setProfileData(prev => ({ ...prev, email: '' }));
-                  handleProfileSubmit({ preventDefault: () => {} });
+                  handleProfileSubmit({ preventDefault: () => { } });
                 }}
               >
                 Skip for now — add email later

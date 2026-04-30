@@ -7,9 +7,28 @@
 
 .auth-card {
   width: 100%;
-  max-width: 400px;
-  padding: 2.5rem;
+  max-width: 450px;
+  padding: 3rem;
   text-align: center;
+}
+
+.auth-logo-wrapper {
+  margin-bottom: 2rem;
+  display: flex;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.auth-logo {
+  height: 80px;
+  width: auto;
+  object-fit: contain;
+  filter: var(--logo-filter);
+  transition: transform 0.3s ease;
+}
+
+.auth-logo:hover {
+  transform: scale(1.05);
 }
 
 .auth-title {
@@ -39,13 +58,13 @@
   border-radius: 8px !important;
   font-weight: 500 !important;
   transition: all 0.3s ease !important;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1) !important;
   margin-top: 1rem;
 }
 
 .google-btn:hover {
   background: #f8f9fa !important;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
   transform: translateY(-1px);
 }
 
@@ -136,8 +155,8 @@
   margin: 0;
 }
 
-.grecaptcha-badge { 
-  visibility: hidden !important; 
+.grecaptcha-badge {
+  visibility: hidden !important;
 }
 
 .recaptcha-terms {
