@@ -13,6 +13,7 @@ const Navbar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const [verificationSent, setVerificationSent] = useState(false);
   const [isLogoHovered, setIsLogoHovered] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const dropdownRef = useRef(null);
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/admin');
@@ -29,10 +30,13 @@ const Navbar = () => {
   };
 
   const handleLogout = () => {
-    if (window.confirm("Are you sure you want to sign out?")) {
-      logout();
-      setShowDropdown(false);
-    }
+    setShowLogoutConfirm(true);
+    setShowDropdown(false);
+  };
+
+  const confirmLogout = () => {
+    logout();
+    setShowLogoutConfirm(false);
   };
 
   // Close dropdown when clicking outside
@@ -137,6 +141,20 @@ const Navbar = () => {
           </div>
         </div>
       </div>
+
+      {/* Logout Confirmation Modal */}
+      {showLogoutConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-panel">
+            <h3 className="modal-title">Confirm Sign Out</h3>
+            <p className="modal-text">Are you sure you want to sign out of your account?</p>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setShowLogoutConfirm(false)}>Cancel</button>
+              <button className="btn-danger" onClick={confirmLogout}>Sign Out</button>
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 };

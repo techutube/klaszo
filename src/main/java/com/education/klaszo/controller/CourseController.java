@@ -25,6 +25,12 @@ import java.util.UUID;
 public class CourseController {
 
     private final CourseService courseService;
+    private final com.education.klaszo.repository.SectionTypeRepository sectionTypeRepository;
+
+    @GetMapping("/courses/section-types")
+    public ResponseEntity<List<com.education.klaszo.model.SectionType>> getAllSectionTypes() {
+        return ResponseEntity.ok(sectionTypeRepository.findAll());
+    }
 
     // Helper to get the logged-in user from the JWT (null if not logged in)
     private UUID currentUserId() {

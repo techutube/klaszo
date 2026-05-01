@@ -9,6 +9,7 @@ const AdminUpload = () => {
   const [courses, setCourses] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [chapters, setChapters] = useState([]);
+  const [sectionTypes, setSectionTypes] = useState([]);
   const [activeTab, setActiveTab] = useState('upload'); 
   
   const [formData, setFormData] = useState({
@@ -26,13 +27,22 @@ const AdminUpload = () => {
   const [courseForm, setCourseForm] = useState({ title: '', description: '', id: null });
   const [subjectForm, setSubjectForm] = useState({ title: '', description: '', courseId: '', id: null });
   const [chapterForm, setChapterForm] = useState({ title: '', description: '', subjectId: '', courseId: '', id: null });
+  const [sectionTypeForm, setSectionTypeForm] = useState({ code: '', title: '', isNew: false });
 
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
+  const [deleteConfirm, setDeleteConfirm] = useState(null);
 
   useEffect(() => {
     fetchCourses();
+    fetchSectionTypes();
   }, []);
+
+  const fetchSectionTypes = () => {
+    axios.get(`${import.meta.env.VITE_API_URL || ''}/api/courses/section-types`)
+      .then(res => setSectionTypes(res.data))
+      .catch(err => console.error("Failed to fetch section types", err));
+  };
 
   const fetchCourses = () => {
     axios.get(`${import.meta.env.VITE_API_URL}/api/courses`)
@@ -180,6 +190,58 @@ const AdminUpload = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleCreateOrUpdateSectionType = async (e) => {
+    e.preventDefault();
+    try {
+      setLoading(true);
+      const url = sectionTypeForm.isNew 
+        ? `${import.meta.env.VITE_API_URL}/api/admin/content/section-types`
+        : `${import.meta.env.VITE_API_URL}/api/admin/content/section-types/${sectionTypeForm.code}`;
+      
+      const method = sectionTypeForm.isNew ? 'post' : 'put';
+      const payload = { code: sectionTypeForm.code, title: sectionTypeForm.title };
+
+      await axios[method](url, payload, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      
+      setMessage({ type: 'success', text: `Section Type ${sectionTypeForm.isNew ? 'created' : 'updated'} successfully!` });
+      setSectionTypeForm({ code: '', title: '', isNew: false });
+      fetchSectionTypes();
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Operation failed.' });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEditSectionType = (st) => {
+    setSectionTypeForm({ code: st.code, title: st.title, isNew: false });
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
+  const handleDeleteSectionType = (code) => {
+    setDeleteConfirm(code);
+  };
+
+  const confirmDeleteSectionType = async () => {
+    if (!deleteConfirm) return;
+    try {
+      setLoading(true);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/content/section-types/${deleteConfirm}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setMessage({ type: 'success', text: 'Section Type deleted successfully!' });
+      fetchSectionTypes();
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Operation failed.' });
+    } finally {
+      setLoading(false);
+      setDeleteConfirm(null);
+    }
+  };
+
+
   const handleUploadContent = async (e) => {
     e.preventDefault();
     if (!formData.file || !formData.subjectId || !formData.title) {
@@ -231,6 +293,9 @@ const AdminUpload = () => {
         <button className={`tab-btn ${activeTab === 'chapter' ? 'active' : ''}`} onClick={() => setActiveTab('chapter')}>
           <BookOpen size={18} /> <span>Chapters</span>
         </button>
+        <button className={`tab-btn ${activeTab === 'section-type' ? 'active' : ''}`} onClick={() => setActiveTab('section-type')}>
+          <FileText size={18} /> <span>Section Types</span>
+        </button>
       </div>
 
       <div className="admin-card glass-panel">
@@ -275,10 +340,11 @@ const AdminUpload = () => {
               <div className="form-group">
                 <label className="form-label">Section Type</label>
                 <select className="form-control" value={formData.sectionType} onChange={(e) => setFormData({...formData, sectionType: e.target.value})}>
-                  <option value="VIDEO">Video Lecture</option>
-                  <option value="NOTES">Revision Notes</option>
-                  <option value="DPP">Daily Practice Paper (DPP)</option>
-                  <option value="MIND_MAP">Mind Map</option>
+                  {sectionTypes.length === 0 ? (
+                    <option value="NOTES">Revision Notes</option>
+                  ) : (
+                    sectionTypes.map(st => <option key={st.code} value={st.code}>{st.title}</option>)
+                  )}
                 </select>
               </div>
             </div>
@@ -462,7 +528,68 @@ const AdminUpload = () => {
             )}
           </div>
         )}
+
+        {activeTab === 'section-type' && (
+          <div className="admin-manage-section">
+            <form onSubmit={handleCreateOrUpdateSectionType} className="admin-form">
+              <h2 className="form-title">{sectionTypeForm.isNew ? 'Create' : 'Update'} <span className="gradient-text">Section Type</span></h2>
+              <div className="form-row">
+                <div className="form-group">
+                  <label className="form-label">Code (Unique ID)</label>
+                  <input type="text" className="form-control" placeholder="e.g. VIDEO" value={sectionTypeForm.code} onChange={(e) => setSectionTypeForm({...sectionTypeForm, code: e.target.value.toUpperCase()})} required disabled={!sectionTypeForm.isNew} />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Display Title</label>
+                  <input type="text" className="form-control" placeholder="e.g. Video Lectures" value={sectionTypeForm.title} onChange={(e) => setSectionTypeForm({...sectionTypeForm, title: e.target.value})} required />
+                </div>
+              </div>
+              <div className="form-actions">
+                <button type="submit" className="btn-primary" disabled={loading}>
+                  {loading ? 'Saving...' : (sectionTypeForm.isNew ? 'Create Section Type' : 'Update Section Type')}
+                </button>
+                <button type="button" className="btn-secondary" onClick={() => setSectionTypeForm({code: '', title: '', isNew: true})}>New</button>
+                {!sectionTypeForm.isNew && sectionTypeForm.code && (
+                  <button type="button" className="btn-secondary" onClick={() => setSectionTypeForm({code: '', title: '', isNew: false})}>Cancel</button>
+                )}
+              </div>
+            </form>
+
+            <div className="items-list-container">
+              <h3 className="list-title">Existing Section Types</h3>
+              <div className="items-grid">
+                {sectionTypes.map(st => (
+                  <div key={st.code} className="item-row glass-panel">
+                    <div className="item-info">
+                      <span className="item-name">{st.title}</span>
+                      <span className="item-badge" style={{marginLeft: '10px', fontSize: '0.8em', color: 'var(--text-muted)'}}>{st.code}</span>
+                    </div>
+                    <div className="item-actions">
+                      <button className="edit-btn" onClick={() => handleEditSectionType(st)}>Edit</button>
+                      <button className="delete-btn" onClick={() => handleDeleteSectionType(st.code)}>Delete</button>
+                    </div>
+                  </div>
+                ))}
+                {sectionTypes.length === 0 && <p className="empty-msg">No section types found.</p>}
+              </div>
+            </div>
+          </div>
+        )}
       </div>
+
+      {deleteConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-panel">
+            <h3 className="modal-title">Confirm Deletion</h3>
+            <p className="modal-text">Are you sure you want to delete this section type? This action cannot be undone.</p>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setDeleteConfirm(null)} disabled={loading}>Cancel</button>
+              <button className="btn-danger" onClick={confirmDeleteSectionType} disabled={loading}>
+                {loading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

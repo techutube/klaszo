@@ -18,7 +18,7 @@
 }
 
 .course-detail-page {
-  padding: 3rem 1.5rem;
+  padding: 2rem 1.5rem;
 }
 
 .detail-header {
@@ -27,8 +27,9 @@
 }
 
 .detail-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   margin-bottom: 1rem;
+  line-height: 1.2;
 }
 
 .course-name-breadcrumb {
@@ -46,8 +47,8 @@
 
 .subjects-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-  gap: 2rem;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
 }
 
 .subject-card {
@@ -118,16 +119,52 @@
 }
 
 @media (max-width: 768px) {
+  .course-detail-page {
+    padding: 1.25rem 1rem;
+  }
+
+  .detail-title {
+    font-size: 1.6rem;
+  }
+
+  .detail-subtitle {
+    font-size: 1rem;
+  }
+
+  .subjects-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
   .subject-card {
     flex-direction: column;
     text-align: center;
+    padding: 1.25rem;
+    gap: 1rem;
   }
   
   .subject-icon-wrapper {
     margin: 0 auto;
+    width: 52px;
+    height: 52px;
   }
   
   .subject-actions {
     justify-content: center;
+    flex-wrap: wrap;
+  }
+}
+
+@media (max-width: 480px) {
+  .detail-title {
+    font-size: 1.4rem;
+  }
+
+  .detail-header {
+    margin-bottom: 1.5rem;
+  }
+
+  .subject-card {
+    padding: 1rem;
   }
 }

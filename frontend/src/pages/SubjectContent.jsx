@@ -14,6 +14,7 @@ const SubjectContent = () => {
   const [loading, setLoading] = useState(true);
   const [expandedChapters, setExpandedChapters] = useState({});
   const [activeItem, setActiveItem] = useState(null);
+  const [sectionTypes, setSectionTypes] = useState({});
 
   const toggleChapter = (chapterId) => {
     setExpandedChapters(prev => ({
@@ -39,6 +40,18 @@ const SubjectContent = () => {
         // Fetch subject details
         const subjectRes = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/subjects/slug/${slug}`, config);
         setSubject(subjectRes.data);
+
+        // Fetch section types
+        try {
+          const sectionTypesRes = await axios.get(`${import.meta.env.VITE_API_URL || ''}/api/courses/section-types`);
+          const typesMap = {};
+          sectionTypesRes.data.forEach(st => {
+            typesMap[st.code] = st.title;
+          });
+          setSectionTypes(typesMap);
+        } catch (stErr) {
+          console.error("Failed to fetch section types", stErr);
+        }
       } catch (error) {
         console.error("Error fetching subject data", error);
         setContent([]);
@@ -96,11 +109,15 @@ const SubjectContent = () => {
     }
   };
 
-  const sectionTitles = {
-    'VIDEO': 'Video Lectures',
-    'NOTES': 'Revision Notes',
-    'DPP': 'Daily Practice Papers (DPP)',
-    'MIND_MAP': 'Mind Maps'
+  const getSectionTitle = (sectionKey) => {
+    // Fallbacks for default hardcoded ones if DB is empty
+    const defaults = {
+      'VIDEO': 'Video Lectures',
+      'NOTES': 'Revision Notes',
+      'DPP': 'Daily Practice Papers (DPP)',
+      'MIND_MAP': 'Mind Maps'
+    };
+    return sectionTypes[sectionKey] || defaults[sectionKey] || sectionKey;
   };
 
   return (
@@ -141,7 +158,7 @@ const SubjectContent = () => {
                   <div className="chapter-sections">
                     {Object.entries(chapter.sections).map(([sectionKey, items]) => (
                       <div key={sectionKey} className="section-group">
-                        <h4 className="section-title">{sectionTitles[sectionKey] || sectionKey}</h4>
+                        <h4 className="section-title">{getSectionTitle(sectionKey)}</h4>
                         <div className="section-items">
                           {items.map((item) => (
                             <button 

@@ -165,3 +165,39 @@
   margin-top: 1.5rem;
   line-height: 1.2;
 }
+
+@media (max-width: 768px) {
+  .auth-card {
+    padding: 2rem 1.5rem;
+  }
+
+  .auth-logo {
+    height: 60px;
+  }
+
+  .auth-title {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-card {
+    padding: 1.5rem 1rem;
+  }
+
+  .auth-logo {
+    height: 50px;
+  }
+
+  .auth-title {
+    font-size: 1.4rem;
+  }
+
+  .auth-form {
+    gap: 1rem;
+  }
+
+  .auth-divider {
+    margin: 1.25rem 0;
+  }
+}

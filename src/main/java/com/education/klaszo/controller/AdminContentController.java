@@ -19,13 +19,39 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/api/admin/content")
 @RequiredArgsConstructor
+@CrossOrigin(origins = "*")
 public class AdminContentController {
 
     private final ContentItemRepository contentItemRepository;
     private final SubjectRepository subjectRepository;
     private final CourseRepository courseRepository;
     private final com.education.klaszo.repository.ChapterRepository chapterRepository;
+    private final com.education.klaszo.repository.SectionTypeRepository sectionTypeRepository;
     private final FileStorageService fileStorageService;
+
+    @GetMapping("/section-types")
+    public ResponseEntity<?> getSectionTypes() {
+        return ResponseEntity.ok(sectionTypeRepository.findAll());
+    }
+
+    @PostMapping("/section-types")
+    public ResponseEntity<?> createSectionType(@RequestBody com.education.klaszo.model.SectionType sectionType) {
+        return ResponseEntity.ok(sectionTypeRepository.save(sectionType));
+    }
+
+    @PutMapping("/section-types/{code}")
+    public ResponseEntity<?> updateSectionType(@PathVariable String code, @RequestBody com.education.klaszo.model.SectionType sectionTypeDetails) {
+        com.education.klaszo.model.SectionType sectionType = sectionTypeRepository.findById(code)
+                .orElseThrow(() -> new IllegalArgumentException("SectionType not found"));
+        sectionType.setTitle(sectionTypeDetails.getTitle());
+        return ResponseEntity.ok(sectionTypeRepository.save(sectionType));
+    }
+
+    @DeleteMapping("/section-types/{code}")
+    public ResponseEntity<?> deleteSectionType(@PathVariable String code) {
+        sectionTypeRepository.deleteById(code);
+        return ResponseEntity.ok().build();
+    }
 
     @PostMapping("/chapters")
     public ResponseEntity<?> createChapter(@RequestBody com.education.klaszo.model.Chapter chapter) {
