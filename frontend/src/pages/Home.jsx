@@ -52,7 +52,15 @@ const Home = () => {
             {courses.map((course) => (
               <div key={course.id} className="course-card glass-panel">
                 <div className="course-image-placeholder">
-                  <BookOpen size={24} className="course-placeholder-icon" />
+                  {course.thumbnailUrl ? (
+                    <img src={course.thumbnailUrl} alt={course.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : course.title.toLowerCase().includes('class 10') ? (
+                    <img src="/class10-agni.png" alt="Class 10 Agni" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : course.title.toLowerCase().includes('class 9') || course.title.toLowerCase().includes('class 09') ? (
+                    <img src="/class9-aagaz.png" alt="Class 9 Aagaz" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                  ) : (
+                    <BookOpen size={24} className="course-placeholder-icon" />
+                  )}
                 </div>
                 <div className="course-content">
                   <h3 className="course-title">{course.title}</h3>
