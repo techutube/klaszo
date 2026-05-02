@@ -10,6 +10,7 @@ if (import.meta.env.VITE_POSTHOG_KEY) {
   posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
     api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
     person_profiles: 'identified_only',
+    capture_pageview: false, // Prevent duplicate pageviews on initial load
     // Privacy and Security settings to mask sensitive data
     session_recording: {
       maskAllInputs: true,
