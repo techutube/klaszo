@@ -1,14 +1,15 @@
 import { useState, useEffect, useContext } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { Book, ChevronRight, ChevronLeft, Lock, PlayCircle, FileText } from 'lucide-react';
+import { Book, Lock } from 'lucide-react';
+import Breadcrumbs from '../components/Breadcrumbs';
 import './CourseDetail.css';
 
 const CourseDetail = () => {
-  const { slug } = useParams();
+  const { courseSlug } = useParams();
+  const slug = courseSlug;
   const { user, token } = useContext(AuthContext);
-  const navigate = useNavigate();
   const [subjects, setSubjects] = useState([]);
   const [course, setCourse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -38,12 +39,10 @@ const CourseDetail = () => {
 
   return (
     <div className="course-detail-page">
-      <button onClick={() => navigate(-1)} className="back-link">
-        <ChevronLeft size={20} /> Back to Courses
-      </button>
+      <Breadcrumbs />
+
       <div className="detail-header">
         <h1 className="detail-title">
-          {course ? <span className="course-name-breadcrumb">{course.title} / </span> : null}
           Choose your <span className="gradient-text">Subject</span>
         </h1>
         <p className="detail-subtitle">Select a subject to access study materials, notes, and video lectures.</p>
@@ -63,7 +62,7 @@ const CourseDetail = () => {
                 <p className="subject-desc">{subject.description}</p>
                 
                 <div className="subject-actions">
-                  <Link to={`/subject/${subject.slug}`} className="btn-secondary view-btn">
+                  <Link to={`/course/${courseSlug}/subject/${subject.slug}`} className="btn-secondary view-btn">
                     View Content
                   </Link>
                   

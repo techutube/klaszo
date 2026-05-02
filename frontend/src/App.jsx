@@ -15,6 +15,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { usePostHog } from 'posthog-js/react';
 
 import { ThemeProvider } from './context/ThemeContext';
+import './components/Breadcrumbs.css';
 
 // Component to track page views
 const PageViewTracker = () => {
@@ -63,9 +64,19 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
-                <Route path="/course/:slug" element={<CourseDetail />} />
+                
+                {/* Course pages */}
+                <Route path="/course/:courseSlug" element={<CourseDetail />} />
+
+                {/* Subject content - nested under course */}
+                <Route path="/course/:courseSlug/subject/:subjectSlug" element={<SubjectContent />} />
+                <Route path="/course/:courseSlug/subject/:subjectSlug/chapter/:chapterId" element={<SubjectContent />} />
+                <Route path="/course/:courseSlug/subject/:subjectSlug/chapter/:chapterId/content/:contentId" element={<SubjectContent />} />
+
+                {/* Legacy redirect: old /subject/:slug URLs -> home (slug alone doesn't have course context) */}
+                <Route path="/subject/:slug" element={<Navigate to="/" replace />} />
+
                 <Route path="/checkout/:subjectId" element={<Checkout />} />
-                <Route path="/subject/:slug" element={<SubjectContent />} />
                 <Route path="/profile" element={<Profile />} />
 
                 <Route path="/admin/upload" element={

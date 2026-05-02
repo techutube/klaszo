@@ -1,0 +1,91 @@
+/* ===== Global Breadcrumb Component ===== */
+.breadcrumb-nav {
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--surface-color, #ffffff12);
+  border: 1px solid var(--glass-border, rgba(255,255,255,0.1));
+  border-radius: 8px;
+  padding: 0.45rem 0.85rem;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+}
+
+.breadcrumb-icon {
+  display: flex;
+  align-items: center;
+  color: var(--text-muted, #9ca3af);
+  margin-right: 0.25rem;
+  flex-shrink: 0;
+}
+
+.breadcrumb-segment {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.breadcrumb-separator {
+  color: var(--text-muted, #9ca3af);
+  font-size: 0.9rem;
+  line-height: 1;
+  user-select: none;
+}
+
+.breadcrumb-item {
+  font-size: 0.78rem;
+  font-weight: 500;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.breadcrumb-link {
+  color: var(--text-muted, #9ca3af);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+.breadcrumb-link:hover {
+  color: var(--accent-primary, #6366f1);
+  text-decoration: none;
+}
+
+.breadcrumb-current {
+  color: var(--text-main, #f1f5f9);
+  font-weight: 600;
+}
+
+/* ===== Global Back Button ===== */
+.global-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-muted, #9ca3af);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  transition: color 0.15s ease, background 0.15s ease;
+  margin-bottom: 0.5rem;
+}
+
+.global-back-btn:hover {
+  color: var(--text-main, #f1f5f9);
+  background: var(--surface-hover, rgba(255,255,255,0.06));
+}
+
+/* Page header layout: back button + breadcrumbs stacked cleanly */
+.page-nav-header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-bottom: 1.5rem;
+}

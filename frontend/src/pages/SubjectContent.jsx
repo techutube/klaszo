@@ -2,11 +2,14 @@ import { useState, useEffect, useContext } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { AuthContext } from '../context/AuthContext';
-import { FileText, Video, Lock, ExternalLink, ChevronLeft, CheckCircle, Layers, BookOpen, ChevronDown, ChevronRight } from 'lucide-react';
+import { FileText, Video, Lock, ExternalLink, CheckCircle, Layers, BookOpen, ChevronDown, ChevronRight } from 'lucide-react';
+import Breadcrumbs from '../components/Breadcrumbs';
 import './SubjectContent.css';
 
 const SubjectContent = () => {
-  const { slug } = useParams();
+  // Support both nested route and legacy route params
+  const { courseSlug, subjectSlug, chapterId: urlChapterId, contentId: urlContentId } = useParams();
+  const slug = subjectSlug; // the subject slug used for API calls
   const { token } = useContext(AuthContext);
   const navigate = useNavigate();
   const [content, setContent] = useState([]);
@@ -21,6 +24,10 @@ const SubjectContent = () => {
       ...prev,
       [chapterId]: !prev[chapterId]
     }));
+    // Update URL to reflect the active chapter
+    if (courseSlug && subjectSlug) {
+      navigate(`/course/${courseSlug}/subject/${subjectSlug}/chapter/${chapterId}`, { replace: true });
+    }
   };
 
   useEffect(() => {
@@ -62,6 +69,37 @@ const SubjectContent = () => {
 
     fetchData();
   }, [slug, token]);
+
+  // On initial load, restore chapter/content from URL params
+  useEffect(() => {
+    if (urlChapterId && content.length > 0) {
+      setExpandedChapters(prev => ({ ...prev, [urlChapterId]: true }));
+    }
+    if (urlContentId && content.length > 0) {
+      // Find the item matching urlContentId across all chapters
+      for (const chapter of content) {
+        for (const items of Object.values(chapter.sections)) {
+          const found = items.find(item => item.id === urlContentId);
+          if (found && found.streamUrl) {
+            setActiveItem(found);
+            break;
+          }
+        }
+      }
+    }
+  }, [urlChapterId, urlContentId, content]);
+
+  const handleContentItemClick = (item, chapterId) => {
+    if (!item.streamUrl) return;
+    setActiveItem(item);
+    // Update URL for analytics: course > subject > chapter > content
+    if (courseSlug && subjectSlug) {
+      navigate(
+        `/course/${courseSlug}/subject/${subjectSlug}/chapter/${chapterId}/content/${item.id}`,
+        { replace: true }
+      );
+    }
+  };
 
   const renderViewer = () => {
     if (!activeItem) return (
@@ -120,19 +158,24 @@ const SubjectContent = () => {
     return sectionTypes[sectionKey] || defaults[sectionKey] || sectionKey;
   };
 
+  // Build a labels map to resolve UUIDs to human-readable names for Breadcrumbs
+  const breadcrumbLabels = {};
+  if (subject) {
+    breadcrumbLabels[subjectSlug] = subject.title;
+  }
+  content.forEach(chapter => {
+    breadcrumbLabels[chapter.id] = chapter.title;
+    Object.values(chapter.sections).forEach(items => {
+      items.forEach(item => {
+        breadcrumbLabels[item.id] = item.title;
+      });
+    });
+  });
+
   return (
     <div className="subject-content-page">
       <div className="content-header">
-        <button onClick={() => navigate(-1)} className="back-link">
-          <ChevronLeft size={20} /> Back
-        </button>
-        {subject && (
-          <div className="breadcrumb">
-            <span className="course-name">{subject.courseTitle}</span>
-            <ChevronRight size={16} />
-            <span className="subject-name">{subject.title}</span>
-          </div>
-        )}
+        <Breadcrumbs labels={breadcrumbLabels} />
       </div>
       
       <div className="content-layout">
@@ -164,7 +207,7 @@ const SubjectContent = () => {
                             <button 
                               key={item.id}
                               className={`content-item-btn ${activeItem?.id === item.id ? 'active' : ''} ${!item.streamUrl ? 'locked' : ''}`}
-                              onClick={() => item.streamUrl && setActiveItem(item)}
+                              onClick={() => handleContentItemClick(item, chapter.id)}
                               disabled={!item.streamUrl}
                             >
                               <div className="item-icon">
