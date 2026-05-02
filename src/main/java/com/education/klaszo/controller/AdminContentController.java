@@ -6,6 +6,7 @@ import com.education.klaszo.model.Course;
 import com.education.klaszo.repository.ContentItemRepository;
 import com.education.klaszo.repository.SubjectRepository;
 import com.education.klaszo.repository.CourseRepository;
+import com.education.klaszo.repository.EnrollmentRepository;
 import com.education.klaszo.service.FileStorageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,7 @@ public class AdminContentController {
     private final CourseRepository courseRepository;
     private final com.education.klaszo.repository.ChapterRepository chapterRepository;
     private final com.education.klaszo.repository.SectionTypeRepository sectionTypeRepository;
+    private final EnrollmentRepository enrollmentRepository;
     private final FileStorageService fileStorageService;
 
     @GetMapping("/section-types")
@@ -75,6 +77,17 @@ public class AdminContentController {
         return ResponseEntity.ok(chapterRepository.findBySubjectIdOrderByDisplayOrderAsc(subjectId));
     }
 
+    @DeleteMapping("/chapters/{id}")
+    public ResponseEntity<?> deleteChapter(@PathVariable UUID id) {
+        List<ContentItem> items = contentItemRepository.findByChapterId(id);
+        for (ContentItem item : items) {
+            fileStorageService.deleteFile(item.getStorageKey());
+        }
+        contentItemRepository.deleteAll(items);
+        chapterRepository.deleteById(id);
+        return ResponseEntity.ok().build();
+    }
+
     @PostMapping("/courses")
     public ResponseEntity<?> createCourse(@RequestBody Course course) {
         return ResponseEntity.ok(courseRepository.save(course));
@@ -104,6 +117,29 @@ public class AdminContentController {
         subject.setTitle(subjectDetails.getTitle());
         subject.setDescription(subjectDetails.getDescription());
         return ResponseEntity.ok(subjectRepository.save(subject));
+    }
+
+    @DeleteMapping("/subjects/{id}")
+    public ResponseEntity<?> deleteSubject(@PathVariable UUID id) {
+        // Delete all associated enrollments
+        List<com.education.klaszo.model.Enrollment> enrollments = enrollmentRepository.findBySubjectId(id);
+        enrollmentRepository.deleteAll(enrollments);
+
+        // Delete all content items and their physical files
+        List<ContentItem> items = contentItemRepository.findBySubjectIdOrderByDisplayOrderAsc(id);
+        for (ContentItem item : items) {
+            fileStorageService.deleteFile(item.getStorageKey());
+        }
+        contentItemRepository.deleteAll(items);
+
+        // Delete all chapters
+        List<com.education.klaszo.model.Chapter> chapters = chapterRepository.findBySubjectIdOrderByDisplayOrderAsc(id);
+        chapterRepository.deleteAll(chapters);
+
+        // Finally, delete the subject itself
+        subjectRepository.deleteById(id);
+        
+        return ResponseEntity.ok().build();
     }
 
     @PostMapping("/upload")

@@ -32,6 +32,8 @@ const AdminUpload = () => {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: '', text: '' });
   const [deleteConfirm, setDeleteConfirm] = useState(null);
+  const [deleteSubjectConfirm, setDeleteSubjectConfirm] = useState(null);
+  const [deleteChapterConfirm, setDeleteChapterConfirm] = useState(null);
 
   useEffect(() => {
     fetchCourses();
@@ -241,6 +243,39 @@ const AdminUpload = () => {
     }
   };
 
+  const confirmDeleteSubject = async () => {
+    if (!deleteSubjectConfirm) return;
+    try {
+      setLoading(true);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/content/subjects/${deleteSubjectConfirm}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setMessage({ type: 'success', text: 'Subject deleted successfully!' });
+      fetchSubjects(subjectForm.courseId);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Operation failed.' });
+    } finally {
+      setLoading(false);
+      setDeleteSubjectConfirm(null);
+    }
+  };
+
+  const confirmDeleteChapter = async () => {
+    if (!deleteChapterConfirm) return;
+    try {
+      setLoading(true);
+      await axios.delete(`${import.meta.env.VITE_API_URL}/api/admin/content/chapters/${deleteChapterConfirm}`, {
+        headers: { 'Authorization': `Bearer ${token}` }
+      });
+      setMessage({ type: 'success', text: 'Chapter deleted successfully!' });
+      fetchChapters(chapterForm.subjectId);
+    } catch (err) {
+      setMessage({ type: 'error', text: 'Operation failed.' });
+    } finally {
+      setLoading(false);
+      setDeleteChapterConfirm(null);
+    }
+  };
 
   const handleUploadContent = async (e) => {
     e.preventDefault();
@@ -457,7 +492,10 @@ const AdminUpload = () => {
                       <div className="item-info">
                         <span className="item-name">{subject.title}</span>
                       </div>
-                      <button className="edit-btn" onClick={() => handleEditSubject(subject)}>Edit</button>
+                      <div className="item-actions">
+                        <button className="edit-btn" onClick={() => handleEditSubject(subject)}>Edit</button>
+                        <button className="delete-btn" onClick={() => setDeleteSubjectConfirm(subject.id)}>Delete</button>
+                      </div>
                     </div>
                   ))}
                   {subjects.length === 0 && <p className="empty-msg">No subjects found for this course.</p>}
@@ -519,7 +557,10 @@ const AdminUpload = () => {
                       <div className="item-info">
                         <span className="item-name">{chapter.title}</span>
                       </div>
-                      <button className="edit-btn" onClick={() => handleEditChapter(chapter)}>Edit</button>
+                      <div className="item-actions">
+                        <button className="edit-btn" onClick={() => handleEditChapter(chapter)}>Edit</button>
+                        <button className="delete-btn" onClick={() => setDeleteChapterConfirm(chapter.id)}>Delete</button>
+                      </div>
                     </div>
                   ))}
                   {chapters.length === 0 && <p className="empty-msg">No chapters found for this subject.</p>}
@@ -584,6 +625,36 @@ const AdminUpload = () => {
             <div className="modal-actions">
               <button className="btn-secondary" onClick={() => setDeleteConfirm(null)} disabled={loading}>Cancel</button>
               <button className="btn-danger" onClick={confirmDeleteSectionType} disabled={loading}>
+                {loading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteSubjectConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-panel">
+            <h3 className="modal-title">Confirm Deletion</h3>
+            <p className="modal-text">Are you sure you want to delete this subject? All associated chapters and their files will be permanently deleted.</p>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setDeleteSubjectConfirm(null)} disabled={loading}>Cancel</button>
+              <button className="btn-danger" onClick={confirmDeleteSubject} disabled={loading}>
+                {loading ? 'Deleting...' : 'Delete'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteChapterConfirm && (
+        <div className="modal-overlay">
+          <div className="modal-content glass-panel">
+            <h3 className="modal-title">Confirm Deletion</h3>
+            <p className="modal-text">Are you sure you want to delete this chapter? All its files will be permanently deleted.</p>
+            <div className="modal-actions">
+              <button className="btn-secondary" onClick={() => setDeleteChapterConfirm(null)} disabled={loading}>Cancel</button>
+              <button className="btn-danger" onClick={confirmDeleteChapter} disabled={loading}>
                 {loading ? 'Deleting...' : 'Delete'}
               </button>
             </div>

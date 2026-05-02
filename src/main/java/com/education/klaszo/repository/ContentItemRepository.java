@@ -10,4 +10,5 @@ import java.util.UUID;
 @Repository
 public interface ContentItemRepository extends JpaRepository<ContentItem, UUID> {
     List<ContentItem> findBySubjectIdOrderByDisplayOrderAsc(UUID subjectId);
+    List<ContentItem> findByChapterId(UUID chapterId);
 }
