@@ -9,7 +9,22 @@ import { PostHogProvider } from 'posthog-js/react'
 if (import.meta.env.VITE_POSTHOG_KEY) {
   posthog.init(import.meta.env.VITE_POSTHOG_KEY, {
     api_host: import.meta.env.VITE_POSTHOG_HOST || 'https://us.i.posthog.com',
-    person_profiles: 'identified_only', // or 'always' to create profiles for anonymous users as well
+    person_profiles: 'identified_only',
+    // Privacy and Security settings to mask sensitive data
+    session_recording: {
+      maskAllInputs: true,
+      maskTextSelector: "*", // masks all text in recordings
+    },
+    sanitize_properties: (properties, event_name) => {
+      // Redact tokens from URLs
+      if (properties.$current_url) {
+        properties.$current_url = properties.$current_url.replace(/token=[^&]*/g, 'token=***');
+      }
+      if (properties.$pathname) {
+        properties.$pathname = properties.$pathname.replace(/token=[^&]*/g, 'token=***');
+      }
+      return properties;
+    }
   })
 } else {
   console.warn("PostHog Key not found. Analytics are disabled.");

@@ -12,18 +12,27 @@ import Profile from './pages/Profile';
 import AdminRoute from './components/AdminRoute';
 import { analytics, logEvent } from './firebase';
 import { Analytics } from '@vercel/analytics/react';
+import { usePostHog } from 'posthog-js/react';
 
 import { ThemeProvider } from './context/ThemeContext';
 
 // Component to track page views
 const PageViewTracker = () => {
   const location = useLocation();
+  const posthog = usePostHog();
 
   useEffect(() => {
     logEvent(analytics, 'page_view', {
       page_path: location.pathname,
     });
-  }, [location]);
+
+    if (posthog) {
+      posthog.capture('$pageview', {
+        $current_url: window.location.href,
+        $pathname: location.pathname,
+      });
+    }
+  }, [location, posthog]);
 
   // Clean up stale incomplete registrations (older than 30 minutes)
   useEffect(() => {
